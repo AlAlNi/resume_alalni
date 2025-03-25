@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>dubai</title>
+  <link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<header>
+  <div class="container">
+    <h1>Dubai Design Inspiration Trip</h1>
+    <p class="subtitle">18-24 апреля 2024 | Сбор визуальных идей на год вперед</p>
+  </div>
+</header>
+
+<div class="container">
+  <div class="trip-info">
+    <div class="info-card">
+      <h3>Бюджет</h3>
+      <p>740 дирхам/день</p>
+      <p>(без учета отеля)</p>
+    </div>
+    <div class="info-card">
+      <h3>Отель</h3>
+      <p>Revier Hotel</p>
+      <p>Business Bay 4*</p>
+    </div>
+    <div class="info-card">
+      <h3>Стиль</h3>
+      <p>Микс современного дизайна, традиций и природы</p>
+    </div>
+    <div class="info-card">
+      <h3>Главная цель</h3>
+      <p>Собрать визуальные идеи на год вперед!</p>
+    </div>
+  </div>
+  
+  <div class="itinerary" id="itinerary"></div>
+</div>
+
+<!-- Карта перенесена сюда (перед футером) -->
+<div class="container">
+  <div class="map-container" id="map"></div>
+</div>
+
+<div class="modal" id="imageModal">
+  <span class="close-modal">&times;</span>
+  <div class="modal-content">
+    <img id="modalImage" src="" alt="">
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <p>© 2024 Dubai Design Trip | Создано для вдохновения</p>
+  </div>
+</footer>
+
+<!-- Подключение скриптов -->
+<script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=ваш_api_ключ"></script>
+<script src="script.js"></script>
+<!-- partial -->
+  <script  src="./script.js"></script>
+
+</body>
+</html>
