@@ -17,11 +17,13 @@
 
     .resume-container {
       width: 794px;
+      height: 1123px; /* A4 at 96dpi */
       background: #fff;
-      margin: 20px auto;
-      box-shadow: 0 4px 24px rgba(60,60,60,0.10);
-      border-radius: 18px;
+      margin: 0 auto;
+      border-radius: 0;
       padding: 40px 36px;
+      overflow: hidden;
+      box-sizing: border-box;
     }
 
     .profile-photo {
@@ -43,7 +45,7 @@
 
     .section-list {
       margin: 0;
-      padding: 0 0 0 20px;
+      padding-left: 20px;
     }
 
     .skills {
@@ -97,7 +99,7 @@
   <div id="resume-content" class="resume-container">
     <img
       class="profile-photo"
-      src="https://github.com/AlAlNi/resume_alalni/blob/main/002.jpg"
+      src="https://raw.githubusercontent.com/AlAlNi/resume_alalni/main/002.jpg"
       alt="Фото для резюме"
     >
 
@@ -152,8 +154,8 @@
         margin:       0,
         filename:     'resume.pdf',
         image:        { type: 'jpeg', quality: 1 },
-        html2canvas:  { scale: 3, useCORS: true },
-        jsPDF:        { unit: 'px', format: 'a4', orientation: 'portrait' }
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'px', format: [794, 1123], orientation: 'portrait' }
       };
       html2pdf().set(opt).from(element).save();
     }
