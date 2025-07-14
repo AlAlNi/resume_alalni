@@ -164,6 +164,26 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script>
+    function getYearLabel(age) {
+      if (age % 100 >= 11 && age % 100 <= 14) return 'лет';
+      const lastDigit = age % 10;
+      if (lastDigit === 1) return 'год';
+      if (lastDigit >= 2 && lastDigit <= 4) return 'года';
+      return 'лет';
+    }
+
+    function calculateAge() {
+      const birthDate = new Date(1984, 2, 26); // Март = 2
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      const label = getYearLabel(age);
+      document.getElementById('age').textContent = `${age} ${label}`;
+    }
+
     function downloadPDF() {
       const element = document.getElementById('resume-content');
       const opt = {
@@ -174,17 +194,6 @@
         jsPDF:        { unit: 'px', format: 'a4', orientation: 'portrait' }
       };
       html2pdf().set(opt).from(element).save();
-    }
-
-    function calculateAge() {
-      const birthDate = new Date(1984, 2, 26); // Март — это 2, потому что месяцы от 0
-      const today = new Date();
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const m = today.getMonth() - birthDate.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-      }
-      document.getElementById('age').textContent = `${age} лет`;
     }
 
     calculateAge();
