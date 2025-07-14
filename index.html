@@ -111,6 +111,23 @@
       font-size: 1.05em;
     }
 
+    .download-button {
+      display: block;
+      margin: 20px auto 0 auto;
+      background: #2d72d9;
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1em;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .download-button:hover {
+      background: #1b54a3;
+    }
+
     @media (max-width: 600px) {
       .resume-container {
         padding: 18px 6px;
@@ -129,10 +146,13 @@
   </style>
 </head>
 <body>
-  <div class="resume-container">
+
+  <button class="download-button" onclick="downloadPDF()">📄 Скачать PDF</button>
+
+  <div id="resume-content" class="resume-container">
     <img
       class="profile-photo"
-      src="https://github.com/AlAlNi/resume_alalni/blob/main/002.jpg"
+      src="https://github.com/AlAlNi/resume_alalni/blob/main/002.jpg?raw=true"
       alt="Фото для резюме"
     >
 
@@ -179,8 +199,9 @@
     </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       const headers = document.querySelectorAll('h1, h2');
       headers.forEach((el, i) => {
         setTimeout(() => {
@@ -199,6 +220,19 @@
         }, 1400 + i * 120);
       });
     });
+
+    function downloadPDF() {
+      const element = document.getElementById('resume-content');
+      const opt = {
+        margin:       0.5,
+        filename:     'resume.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    }
   </script>
+
 </body>
 </html>
