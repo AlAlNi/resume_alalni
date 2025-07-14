@@ -2,153 +2,80 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Резюме — Портфолио</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Опыт работы — SMM-дизайнер</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
     body {
-      font-family: 'Montserrat', Arial, sans-serif;
-      background: #f7f8fa;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f7f7f7;
+      color: #333;
       margin: 0;
       padding: 0;
-      color: #24292f;
     }
-    .resume-container {
+    .container {
       max-width: 800px;
-      background: #fff;
       margin: 40px auto;
-      box-shadow: 0 4px 24px rgba(60,60,60,0.10);
-      border-radius: 18px;
-      padding: 40px 36px;
-      opacity: 0;
-      animation: fadeIn 1.2s ease forwards;
+      background: #fff;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    h1 {
+      text-align: center;
+      color: #1a1a1a;
     }
-    h1, h2 {
-      opacity: 0;
-      transform: translateX(-30px);
+    h2 {
+      color: #4a4a4a;
+      margin-top: 30px;
     }
-    .skills .skill-tag {
-      opacity: 0;
-      transform: translateY(20px);
+    ul {
+      list-style-type: "\1F539 ";
+      padding-left: 1.2em;
     }
-    @keyframes slideInLeft {
-      from { opacity: 0; transform: translateX(-30px);}
-      to { opacity: 1; transform: translateX(0);}
+    li {
+      margin-bottom: 10px;
     }
-    @keyframes slideInUp {
-      from { opacity: 0; transform: translateY(20px);}
-      to { opacity: 1; transform: translateY(0);}
-    }
-    .slide-in {
-      animation: slideInLeft 1s ease forwards;
-    }
-    .slide-in-up {
-      animation: slideInUp 0.7s ease forwards;
-    }
-    .section-list {
-      margin: 0;
-      padding: 0 0 0 20px;
-    }
-    .skills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 8px;
-    }
-    .skill-tag {
-      background: #e6f0ff;
-      color: #2d72d9;
-      padding: 6px 14px;
-      border-radius: 16px;
-      font-size: 1em;
-      margin-bottom: 6px;
-      display: inline-block;
-    }
-    .extra {
-      background: #f0f4fa;
-      border-left: 4px solid #2d72d9;
-      padding: 12px 18px;
-      margin-top: 18px;
-      border-radius: 10px;
-      font-size: 1.05em;
-    }
-    @media (max-width: 600px) {
-      .resume-container {
-        padding: 18px 6px;
-      }
-      h1 {
-        font-size: 1.4em;
-      }
+    .section {
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <div class="resume-container">
-    <h1>Опыт работы и навыки</h1>
+  <div class="container">
+    <h1>Опыт работы — SMM-дизайнер</h1>
 
-    <h2>🏢 Профессиональный опыт</h2>
-    <ul class="section-list">
-      <li>
-        <b>Индивидуальный предприниматель (ИП), 2016 — настоящее время</b><br>
-        Развитие собственного бизнеса в сфере визуального оформления и онлайн-продвижения.<br>
-        <ul>
-          <li>Дизайн постов, сторис и баннеров для социальных сетей</li>
-          <li>Оформление Telegram-канала</li>
-          <li>Разработка логотипов, фирменного стиля, презентаций</li>
-          <li>Настройка рекламных кампаний</li>
-          <li>Создание сайтов на Tilda (владение HTML/CSS, JS)</li>
-          <li>Визуализация объектов в Blender и Adobe Substance 3D</li>
-        </ul>
-      </li>
-    </ul>
-
-    <h2>🎓 Образование и курсы</h2>
-    <ul class="section-list">
-      <li><b>Инженер</b> — Марийский государственный университет (МарГУ)</li>
-      <li><b>Разработка программного обеспечения</b> — Университет Иннополис</li>
-      <li><b>Курсы 3D-графики</b> — Realtime School, Kaino</li>
-      <li><b>Дизайн и визуальный стиль для соцсетей</b> — Skillbox, Вольница</li>
-    </ul>
-
-    <h2>🛠️ Ключевые навыки</h2>
-    <div class="skills">
-      <span class="skill-tag">Figma</span>
-      <span class="skill-tag">Photoshop</span>
-      <span class="skill-tag">Illustrator</span>
-      <span class="skill-tag">Blender</span>
-      <span class="skill-tag">Substance 3D</span>
-      <span class="skill-tag">MS Office</span>
+    <div class="section">
+      <h2>📌 Опыт работы</h2>
+      <p><strong>🔹 ИП, 2016 — настоящее время</strong></p>
+      <p>Развивал собственный бизнес, выполняя все задачи по визуальному оформлению и онлайн-продвижению:</p>
+      <ul>
+        <li>дизайн постов, сторис и баннеров для соцсетей</li>
+        <li>оформление Telegram-канала</li>
+        <li>логотипы, фирменный стиль, презентации</li>
+        <li>настройка рекламы</li>
+        <li>создание сайтов на Tilda (владение HTML/CSS, JS)</li>
+        <li>визуализация объектов в Blender и Adobe Substance 3D</li>
+      </ul>
     </div>
 
-    <div class="extra">
-      <b>📈 Дополнительная экспертиза:</b><br>
-      Опыт в контент-дизайне: оформление Reels, YouTube Shorts, Telegram.<br>
-      Создание обложек и формирование визуального языка бренда.
+    <div class="section">
+      <h2>📚 Образование и курсы</h2>
+      <ul>
+        <li>Инженер, МарГУ</li>
+        <li>Разработка ПО, Университет Иннополис</li>
+        <li>Курсы 3D-графики (Realtime School, Kaino)</li>
+        <li>Дизайн и визуальный стиль для соцсетей (Skillbox, Вольница)</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>🛠 Навыки</h2>
+      <ul>
+        <li>Figma, Photoshop, Illustrator, Blender, Substance 3D, MS Office</li>
+        <li>Опыт в контент-дизайне, оформлении Reels, YouTube Shorts, Telegram</li>
+        <li>Обложки и визуальный язык бренда</li>
+      </ul>
     </div>
   </div>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const headers = document.querySelectorAll('h1, h2');
-      headers.forEach((el, i) => {
-        setTimeout(() => {
-          el.classList.add('slide-in');
-          el.style.opacity = '1';
-          el.style.transform = 'translateX(0)';
-        }, 600 + i * 250);
-      });
-      const skills = document.querySelectorAll('.skill-tag');
-      skills.forEach((el, i) => {
-        setTimeout(() => {
-          el.classList.add('slide-in-up');
-          el.style.opacity = '1';
-          el.style.transform = 'translateY(0)';
-        }, 1400 + i * 120);
-      });
-    });
-  </script>
 </body>
 </html>
