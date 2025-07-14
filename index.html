@@ -1,68 +1,154 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>dubai</title>
-  <link rel="stylesheet" href="./style.css">
-
+  <title>Резюме — Портфолио</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+    body {
+      font-family: 'Montserrat', Arial, sans-serif;
+      background: #f7f8fa;
+      margin: 0;
+      padding: 0;
+      color: #24292f;
+    }
+    .resume-container {
+      max-width: 800px;
+      background: #fff;
+      margin: 40px auto;
+      box-shadow: 0 4px 24px rgba(60,60,60,0.10);
+      border-radius: 18px;
+      padding: 40px 36px;
+      opacity: 0;
+      animation: fadeIn 1.2s ease forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    h1, h2 {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    .skills .skill-tag {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-30px);}
+      to { opacity: 1; transform: translateX(0);}
+    }
+    @keyframes slideInUp {
+      from { opacity: 0; transform: translateY(20px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    .slide-in {
+      animation: slideInLeft 1s ease forwards;
+    }
+    .slide-in-up {
+      animation: slideInUp 0.7s ease forwards;
+    }
+    .section-list {
+      margin: 0;
+      padding: 0 0 0 20px;
+    }
+    .skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .skill-tag {
+      background: #e6f0ff;
+      color: #2d72d9;
+      padding: 6px 14px;
+      border-radius: 16px;
+      font-size: 1em;
+      margin-bottom: 6px;
+      display: inline-block;
+    }
+    .extra {
+      background: #f0f4fa;
+      border-left: 4px solid #2d72d9;
+      padding: 12px 18px;
+      margin-top: 18px;
+      border-radius: 10px;
+      font-size: 1.05em;
+    }
+    @media (max-width: 600px) {
+      .resume-container {
+        padding: 18px 6px;
+      }
+      h1 {
+        font-size: 1.4em;
+      }
+    }
+  </style>
 </head>
 <body>
-<!-- partial:index.partial.html -->
-<header>
-  <div class="container">
-    <h1>Dubai Design Inspiration Trip</h1>
-    <p class="subtitle">18-24 апреля 2024 | Сбор визуальных идей на год вперед</p>
-  </div>
-</header>
+  <div class="resume-container">
+    <h1>Опыт работы и навыки</h1>
 
-<div class="container">
-  <div class="trip-info">
-    <div class="info-card">
-      <h3>Бюджет</h3>
-      <p>740 дирхам/день</p>
-      <p>(без учета отеля)</p>
+    <h2>🏢 Профессиональный опыт</h2>
+    <ul class="section-list">
+      <li>
+        <b>Индивидуальный предприниматель (ИП), 2016 — настоящее время</b><br>
+        Развитие собственного бизнеса в сфере визуального оформления и онлайн-продвижения.<br>
+        <ul>
+          <li>Дизайн постов, сторис и баннеров для социальных сетей</li>
+          <li>Оформление Telegram-канала</li>
+          <li>Разработка логотипов, фирменного стиля, презентаций</li>
+          <li>Настройка рекламных кампаний</li>
+          <li>Создание сайтов на Tilda (владение HTML/CSS, JS)</li>
+          <li>Визуализация объектов в Blender и Adobe Substance 3D</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h2>🎓 Образование и курсы</h2>
+    <ul class="section-list">
+      <li><b>Инженер</b> — Марийский государственный университет (МарГУ)</li>
+      <li><b>Разработка программного обеспечения</b> — Университет Иннополис</li>
+      <li><b>Курсы 3D-графики</b> — Realtime School, Kaino</li>
+      <li><b>Дизайн и визуальный стиль для соцсетей</b> — Skillbox, Вольница</li>
+    </ul>
+
+    <h2>🛠️ Ключевые навыки</h2>
+    <div class="skills">
+      <span class="skill-tag">Figma</span>
+      <span class="skill-tag">Photoshop</span>
+      <span class="skill-tag">Illustrator</span>
+      <span class="skill-tag">Blender</span>
+      <span class="skill-tag">Substance 3D</span>
+      <span class="skill-tag">MS Office</span>
     </div>
-    <div class="info-card">
-      <h3>Отель</h3>
-      <p>Revier Hotel</p>
-      <p>Business Bay 4*</p>
-    </div>
-    <div class="info-card">
-      <h3>Стиль</h3>
-      <p>Микс современного дизайна, традиций и природы</p>
-    </div>
-    <div class="info-card">
-      <h3>Главная цель</h3>
-      <p>Собрать визуальные идеи на год вперед!</p>
+
+    <div class="extra">
+      <b>📈 Дополнительная экспертиза:</b><br>
+      Опыт в контент-дизайне: оформление Reels, YouTube Shorts, Telegram.<br>
+      Создание обложек и формирование визуального языка бренда.
     </div>
   </div>
-  
-  <div class="itinerary" id="itinerary"></div>
-</div>
-
-<!-- Карта перенесена сюда (перед футером) -->
-<div class="container">
-  <div class="map-container" id="map"></div>
-</div>
-
-<div class="modal" id="imageModal">
-  <span class="close-modal">&times;</span>
-  <div class="modal-content">
-    <img id="modalImage" src="" alt="">
-  </div>
-</div>
-
-<footer>
-  <div class="container">
-    <p>© 2024 Dubai Design Trip | Создано для вдохновения</p>
-  </div>
-</footer>
-
-<!-- Подключение скриптов -->
-<script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=ваш_api_ключ"></script>
-<script src="script.js"></script>
-<!-- partial -->
-  <script  src="./script.js"></script>
-
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const headers = document.querySelectorAll('h1, h2');
+      headers.forEach((el, i) => {
+        setTimeout(() => {
+          el.classList.add('slide-in');
+          el.style.opacity = '1';
+          el.style.transform = 'translateX(0)';
+        }, 600 + i * 250);
+      });
+      const skills = document.querySelectorAll('.skill-tag');
+      skills.forEach((el, i) => {
+        setTimeout(() => {
+          el.classList.add('slide-in-up');
+          el.style.opacity = '1';
+          el.style.transform = 'translateY(0)';
+        }, 1400 + i * 120);
+      });
+    });
+  </script>
 </body>
 </html>
