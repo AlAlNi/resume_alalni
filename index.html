@@ -17,12 +17,9 @@
 
     .resume-container {
       width: 794px;
-      height: 1123px;
       background: #fff;
       margin: 0 auto;
-      border-radius: 0;
       padding: 40px 36px;
-      overflow: hidden;
       box-sizing: border-box;
     }
 
@@ -173,7 +170,7 @@
     }
 
     function calculateAge() {
-      const birthDate = new Date(1984, 2, 26); // Март = 2
+      const birthDate = new Date(1984, 2, 26); // 26 марта 1984
       const today = new Date();
       let age = today.getFullYear() - birthDate.getFullYear();
       const m = today.getMonth() - birthDate.getMonth();
@@ -187,11 +184,19 @@
     function downloadPDF() {
       const element = document.getElementById('resume-content');
       const opt = {
-        margin:       0,
-        filename:     'resume.pdf',
-        image:        { type: 'jpeg', quality: 1 },
-        html2canvas:  { scale: 3, useCORS: true },
-        jsPDF:        { unit: 'px', format: 'a4', orientation: 'portrait' }
+        margin: 0,
+        filename: 'resume.pdf',
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          scrollY: 0
+        },
+        jsPDF: {
+          unit: 'pt',
+          format: 'a4',
+          orientation: 'portrait'
+        }
       };
       html2pdf().set(opt).from(element).save();
     }
