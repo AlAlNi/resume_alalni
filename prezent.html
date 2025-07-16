@@ -15,6 +15,7 @@
             align-items: center;
             height: 100vh;
             font-family: Arial, sans-serif;
+            touch-action: none;
         }
         
         #animation-container {
@@ -29,6 +30,7 @@
             max-height: 90vh;
             display: block;
             margin: 0 auto;
+            image-rendering: crisp-edges;
         }
         
         #frame-info {
@@ -46,18 +48,32 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
+        
+        .progress-bar {
+            width: 100%;
+            height: 5px;
+            background-color: #333;
+            margin-top: 10px;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+        }
     </style>
 </head>
 <body>
     <div id="animation-container">
-        <div id="loading">Загрузка кадров...</div>
+        <div id="loading">Загрузка...</div>
         <img id="frame" style="display: none;">
         <div id="frame-info">Кадр 0 из 32</div>
+        <div class="progress-bar"><div class="progress" id="progress-bar"></div></div>
     </div>
 
     <script>
         // Конфигурация
-        const totalFrames = 33; // Кадры от 00000 до 00032 (всего 33 кадра)
+        const totalFrames = 33; // 00000-00032
         const baseUrl = 'https://raw.githubusercontent.com/AlAlNi/resume_alalni/main/sec/Comp_';
         const fileExtension = '.png';
         
@@ -65,81 +81,141 @@
         const frameElement = document.getElementById('frame');
         const frameInfoElement = document.getElementById('frame-info');
         const loadingElement = document.getElementById('loading');
-        const animationContainer = document.getElementById('animation-container');
+        const progressBar = document.getElementById('progress-bar');
         
         // Переменные состояния
         let currentFrame = 0;
-        let framesLoaded = 0;
-        let frames = [];
-        let isScrolling = false;
-        let scrollTimeout;
+        let frames = new Array(totalFrames);
+        let isAnimating = false;
+        let lastScrollTime = 0;
+        const scrollDelay = 100; // Задержка между переключениями в ms
         
-        // Предзагрузка всех кадров
-        function preloadFrames() {
-            frames = new Array(totalFrames);
+        // Загружаем первый кадр и предзагружаем соседние
+        function loadInitialFrame() {
+            loadFrame(0, () => {
+                loadingElement.style.display = 'none';
+                frameElement.style.display = 'block';
+                updateProgressBar();
+                
+                // Предзагружаем соседние кадры
+                preloadAdjacentFrames();
+            });
+        }
+        
+        // Загружаем конкретный кадр
+        function loadFrame(index, callback) {
+            if (frames[index]) {
+                if (callback) callback();
+                return;
+            }
             
-            for (let i = 0; i < totalFrames; i++) {
-                const frameNumber = i.toString().padStart(5, '0');
-                const img = new Image();
-                img.src = `${baseUrl}${frameNumber}${fileExtension}`;
-                
-                img.onload = () => {
-                    frames[i] = img;
-                    framesLoaded++;
-                    
-                    // Если все кадры загружены, показываем первый кадр
-                    if (framesLoaded === totalFrames) {
-                        loadingElement.style.display = 'none';
-                        frameElement.style.display = 'block';
-                        updateFrame(0);
-                    }
-                };
-                
-                img.onerror = () => {
-                    console.error(`Ошибка загрузки кадра ${i}`);
-                    framesLoaded++;
-                };
+            const frameNumber = index.toString().padStart(5, '0');
+            const img = new Image();
+            img.src = `${baseUrl}${frameNumber}${fileExtension}`;
+            
+            img.onload = () => {
+                frames[index] = img;
+                if (callback) callback();
+                updateProgressBar();
+            };
+            
+            img.onerror = () => {
+                console.error(`Ошибка загрузки кадра ${index}`);
+                if (callback) callback();
+            };
+        }
+        
+        // Предзагружаем соседние кадры для плавности
+        function preloadAdjacentFrames() {
+            const preloadCount = 2;
+            for (let i = 1; i <= preloadCount; i++) {
+                if (currentFrame + i < totalFrames) loadFrame(currentFrame + i);
+                if (currentFrame - i >= 0) loadFrame(currentFrame - i);
             }
         }
         
-        // Обновление отображаемого кадра
+        // Обновляем отображаемый кадр
         function updateFrame(frameIndex) {
             if (frameIndex < 0) frameIndex = 0;
             if (frameIndex >= totalFrames) frameIndex = totalFrames - 1;
             
-            currentFrame = frameIndex;
-            
-            if (frames[currentFrame]) {
-                frameElement.src = frames[currentFrame].src;
-                frameInfoElement.textContent = `Кадр ${currentFrame} из ${totalFrames - 1}`;
+            // Если кадр еще не загружен, загружаем его
+            if (!frames[frameIndex]) {
+                loadFrame(frameIndex, () => {
+                    showFrame(frameIndex);
+                });
+                return;
             }
+            
+            showFrame(frameIndex);
         }
         
-        // Обработчик прокрутки колесика мыши
+        // Показываем загруженный кадр
+        function showFrame(frameIndex) {
+            currentFrame = frameIndex;
+            frameElement.src = frames[currentFrame].src;
+            frameInfoElement.textContent = `Кадр ${currentFrame} из ${totalFrames - 1}`;
+            
+            // Предзагружаем соседние кадры
+            preloadAdjacentFrames();
+        }
+        
+        // Обновляем прогресс-бар загрузки
+        function updateProgressBar() {
+            const loadedCount = frames.filter(f => f).length;
+            const progress = (loadedCount / totalFrames) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+        
+        // Обработчик прокрутки
         function handleWheel(event) {
-            if (!isScrolling && framesLoaded === totalFrames) {
-                isScrolling = true;
-                
-                // Определяем направление прокрутки
-                const delta = Math.sign(event.deltaY);
-                
-                // Изменяем кадр
-                updateFrame(currentFrame + delta);
-                
-                // Задержка перед следующим изменением кадра
-                clearTimeout(scrollTimeout);
-                scrollTimeout = setTimeout(() => {
-                    isScrolling = false;
-                }, 50);
-                
-                // Отменяем стандартное поведение прокрутки
+            const now = Date.now();
+            if (now - lastScrollTime < scrollDelay) {
                 event.preventDefault();
+                return;
             }
+            
+            lastScrollTime = now;
+            
+            const delta = Math.sign(event.deltaY);
+            const newFrame = currentFrame + delta;
+            
+            if (newFrame !== currentFrame && newFrame >= 0 && newFrame < totalFrames) {
+                updateFrame(newFrame);
+            }
+            
+            event.preventDefault();
         }
         
         // Инициализация
         window.addEventListener('wheel', handleWheel, { passive: false });
-        preloadFrames();
+        
+        // Для мобильных устройств
+        let touchStartY = 0;
+        
+        window.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        }, { passive: false });
+        
+        window.addEventListener('touchmove', (e) => {
+            const touchY = e.touches[0].clientY;
+            const deltaY = touchStartY - touchY;
+            
+            if (Math.abs(deltaY) > 10) {
+                const delta = Math.sign(deltaY);
+                const newFrame = currentFrame + delta;
+                
+                if (newFrame !== currentFrame && newFrame >= 0 && newFrame < totalFrames) {
+                    updateFrame(newFrame);
+                    touchStartY = touchY;
+                }
+                
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
+        // Начинаем загрузку
+        loadInitialFrame();
     </script>
 </body>
 </html>
