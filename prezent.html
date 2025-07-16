@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Анимация при прокрутке</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        
+        #animation-container {
+            position: relative;
+            max-width: 100%;
+            max-height: 100vh;
+            text-align: center;
+        }
+        
+        #frame {
+            max-width: 100%;
+            max-height: 90vh;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        #frame-info {
+            color: white;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 18px;
+        }
+        
+        #loading {
+            color: white;
+            font-size: 24px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+    <div id="animation-container">
+        <div id="loading">Загрузка кадров...</div>
+        <img id="frame" style="display: none;">
+        <div id="frame-info">Кадр 0 из 32</div>
+    </div>
+
+    <script>
+        // Конфигурация
+        const totalFrames = 33; // Кадры от 00000 до 00032 (всего 33 кадра)
+        const baseUrl = 'https://raw.githubusercontent.com/AlAlNi/resume_alalni/main/sec/Comp_';
+        const fileExtension = '.png';
+        
+        // Элементы DOM
+        const frameElement = document.getElementById('frame');
+        const frameInfoElement = document.getElementById('frame-info');
+        const loadingElement = document.getElementById('loading');
+        const animationContainer = document.getElementById('animation-container');
+        
+        // Переменные состояния
+        let currentFrame = 0;
+        let framesLoaded = 0;
+        let frames = [];
+        let isScrolling = false;
+        let scrollTimeout;
+        
+        // Предзагрузка всех кадров
+        function preloadFrames() {
+            frames = new Array(totalFrames);
+            
+            for (let i = 0; i < totalFrames; i++) {
+                const frameNumber = i.toString().padStart(5, '0');
+                const img = new Image();
+                img.src = `${baseUrl}${frameNumber}${fileExtension}`;
+                
+                img.onload = () => {
+                    frames[i] = img;
+                    framesLoaded++;
+                    
+                    // Если все кадры загружены, показываем первый кадр
+                    if (framesLoaded === totalFrames) {
+                        loadingElement.style.display = 'none';
+                        frameElement.style.display = 'block';
+                        updateFrame(0);
+                    }
+                };
+                
+                img.onerror = () => {
+                    console.error(`Ошибка загрузки кадра ${i}`);
+                    framesLoaded++;
+                };
+            }
+        }
+        
+        // Обновление отображаемого кадра
+        function updateFrame(frameIndex) {
+            if (frameIndex < 0) frameIndex = 0;
+            if (frameIndex >= totalFrames) frameIndex = totalFrames - 1;
+            
+            currentFrame = frameIndex;
+            
+            if (frames[currentFrame]) {
+                frameElement.src = frames[currentFrame].src;
+                frameInfoElement.textContent = `Кадр ${currentFrame} из ${totalFrames - 1}`;
+            }
+        }
+        
+        // Обработчик прокрутки колесика мыши
+        function handleWheel(event) {
+            if (!isScrolling && framesLoaded === totalFrames) {
+                isScrolling = true;
+                
+                // Определяем направление прокрутки
+                const delta = Math.sign(event.deltaY);
+                
+                // Изменяем кадр
+                updateFrame(currentFrame + delta);
+                
+                // Задержка перед следующим изменением кадра
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 50);
+                
+                // Отменяем стандартное поведение прокрутки
+                event.preventDefault();
+            }
+        }
+        
+        // Инициализация
+        window.addEventListener('wheel', handleWheel, { passive: false });
+        preloadFrames();
+    </script>
+</body>
+</html>
