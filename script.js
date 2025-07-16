@@ -1,5 +1,5 @@
 // Конфигурация
-const totalFrames = 33; // 00000-00032
+const totalFrames = 33;
 const baseUrl = 'https://raw.githubusercontent.com/AlAlNi/resume_alalni/main/sec/Comp_';
 const fileExtension = '.png';
 
@@ -14,47 +14,46 @@ const scrollbarThumb = document.getElementById('scrollbar-thumb');
 // Переменные состояния
 let currentFrame = 0;
 let frames = new Array(totalFrames);
-let lastScrollTime = 0;
-const scrollDelay = 150; // Задержка между переключениями в ms
 let isDragging = false;
 
 // Инициализация скроллбара
 function initScrollbar() {
     updateScrollbarThumb();
     
-    // Обработчики для drag'n'drop скроллбара
     scrollbarThumb.addEventListener('mousedown', (e) => {
         isDragging = true;
+        document.addEventListener('mousemove', handleThumbDrag);
+        document.addEventListener('mouseup', stopThumbDrag);
         e.preventDefault();
     });
     
-    document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        
-        const scrollbarRect = scrollbar.getBoundingClientRect();
-        const y = e.clientY - scrollbarRect.top;
-        const percent = Math.min(1, Math.max(0, y / scrollbarRect.height));
-        const frameIndex = Math.floor(percent * (totalFrames - 1));
-        
-        updateFrame(frameIndex);
-    });
-    
-    document.addEventListener('mouseup', () => {
-        isDragging = false;
-    });
-    
-    // Клик по скроллбару для перехода к кадру
     scrollbar.addEventListener('click', (e) => {
-        const scrollbarRect = scrollbar.getBoundingClientRect();
-        const y = e.clientY - scrollbarRect.top;
-        const percent = Math.min(1, Math.max(0, y / scrollbarRect.height));
-        const frameIndex = Math.floor(percent * (totalFrames - 1));
-        
+        const rect = scrollbar.getBoundingClientRect();
+        const y = e.clientY - rect.top;
+        const percent = y / rect.height;
+        const frameIndex = Math.min(totalFrames - 1, Math.floor(percent * totalFrames));
         updateFrame(frameIndex);
     });
 }
 
-// Обновление положения ползунка скроллбара
+function handleThumbDrag(e) {
+    if (!isDragging) return;
+    
+    const rect = scrollbar.getBoundingClientRect();
+    let y = e.clientY - rect.top;
+    y = Math.max(0, Math.min(rect.height, y));
+    const percent = y / rect.height;
+    const frameIndex = Math.min(totalFrames - 1, Math.floor(percent * totalFrames));
+    
+    updateFrame(frameIndex);
+}
+
+function stopThumbDrag() {
+    isDragging = false;
+    document.removeEventListener('mousemove', handleThumbDrag);
+    document.removeEventListener('mouseup', stopThumbDrag);
+}
+
 function updateScrollbarThumb() {
     const thumbHeight = scrollbar.offsetHeight / totalFrames * 3;
     const position = (currentFrame / (totalFrames - 1)) * (scrollbar.offsetHeight - thumbHeight);
@@ -63,22 +62,78 @@ function updateScrollbarThumb() {
     scrollbarThumb.style.top = `${position}px`;
 }
 
-// ... (остальные функции остаются такими же, как в предыдущей версии)
+// Загрузка кадров
+function loadInitialFrame() {
+    loadFrame(0, () => {
+        loadingElement.style.display = 'none';
+        frameElement.style.display = 'block';
+        updateProgressBar();
+        preloadAdjacentFrames();
+    });
+}
 
-// В функции showFrame добавляем обновление скроллбара
-function showFrame(frameIndex) {
+function loadFrame(index, callback) {
+    if (frames[index]) {
+        if (callback) callback();
+        return;
+    }
+    
+    const frameNumber = index.toString().padStart(5, '0');
+    const img = new Image();
+    img.src = `${baseUrl}${frameNumber}${fileExtension}`;
+    
+    img.onload = () => {
+        frames[index] = img;
+        if (callback) callback();
+        updateProgressBar();
+    };
+    
+    img.onerror = () => {
+        console.error(`Ошибка загрузки кадра ${index}`);
+        if (callback) callback();
+    };
+}
+
+function preloadAdjacentFrames() {
+    const preloadCount = 3;
+    for (let i = 1; i <= preloadCount; i++) {
+        if (currentFrame + i < totalFrames) loadFrame(currentFrame + i);
+        if (currentFrame - i >= 0) loadFrame(currentFrame - i);
+    }
+}
+
+function updateFrame(frameIndex) {
+    frameIndex = Math.max(0, Math.min(totalFrames - 1, frameIndex));
     currentFrame = frameIndex;
+    
+    if (frames[currentFrame]) {
+        showFrame();
+    } else {
+        loadFrame(currentFrame, showFrame);
+    }
+}
+
+function showFrame() {
     frameElement.src = frames[currentFrame].src;
     frameInfoElement.textContent = `Кадр ${currentFrame} из ${totalFrames - 1}`;
     updateScrollbarThumb();
     preloadAdjacentFrames();
 }
 
-// Инициализация (добавляем инициализацию скроллбара)
-window.addEventListener('wheel', handleWheel, { passive: false });
-window.addEventListener('touchstart', handleTouchStart, { passive: false });
-window.addEventListener('touchmove', handleTouchMove, { passive: false });
+function updateProgressBar() {
+    const loadedCount = frames.filter(f => f).length;
+    progressBar.style.width = `${(loadedCount / totalFrames) * 100}%`;
+}
 
-// Начинаем загрузку
+// Обработчики событий
+function handleWheel(e) {
+    e.preventDefault();
+    const delta = Math.sign(e.deltaY);
+    updateFrame(currentFrame + delta);
+}
+
+window.addEventListener('wheel', handleWheel, { passive: false });
+
+// Инициализация
 loadInitialFrame();
-initScrollbar(); // Инициализируем скроллбар
+initScrollbar();
