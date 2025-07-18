@@ -63,7 +63,16 @@ function updateScrollbarThumb() {
 // Frame loading
 function loadInitialFrame() {
     loadFrame(0, () => {
+        showFrame(); // Показываем первый кадр сразу после загрузки
         preloadAdjacentFrames();
+        
+        // Плавно скрываем прелоадер
+        setTimeout(() => {
+            loadingContainer.style.opacity = '0';
+            setTimeout(() => {
+                loadingContainer.style.display = 'none';
+            }, 500);
+        }, 500);
     });
 }
 
@@ -80,16 +89,6 @@ function loadFrame(index, callback) {
     img.onload = () => {
         frames[index] = img;
         if (callback) callback();
-        
-        if (index === 0) {
-            frameElement.style.display = 'block';
-            setTimeout(() => {
-                loadingContainer.style.opacity = '0';
-                setTimeout(() => {
-                    loadingContainer.style.display = 'none';
-                }, 500);
-            }, 500);
-        }
     };
     
     img.onerror = () => {
@@ -119,6 +118,7 @@ function updateFrame(frameIndex) {
 
 function showFrame() {
     frameElement.src = frames[currentFrame].src;
+    frameElement.style.display = 'block'; // Убедимся, что кадр видим
     updateScrollbarThumb();
     preloadAdjacentFrames();
 }
@@ -133,5 +133,6 @@ function handleWheel(e) {
 window.addEventListener('wheel', handleWheel, { passive: false });
 
 // Initialization
+frameElement.style.display = 'none'; // Сначала скрываем кадр
 loadInitialFrame();
 initScrollbar();
