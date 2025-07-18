@@ -6,7 +6,7 @@ const fileExtension = '.png';
 // Элементы DOM
 const frameElement = document.getElementById('frame');
 const frameInfoElement = document.getElementById('frame-info');
-const loadingElement = document.getElementById('loading');
+const loadingContainer = document.getElementById('loading-container');
 const progressBar = document.getElementById('progress-bar');
 const scrollbar = document.getElementById('scrollbar');
 const scrollbarThumb = document.getElementById('scrollbar-thumb');
@@ -65,8 +65,6 @@ function updateScrollbarThumb() {
 // Загрузка кадров
 function loadInitialFrame() {
     loadFrame(0, () => {
-        loadingElement.style.display = 'none';
-        frameElement.style.display = 'block';
         updateProgressBar();
         preloadAdjacentFrames();
     });
@@ -86,6 +84,17 @@ function loadFrame(index, callback) {
         frames[index] = img;
         if (callback) callback();
         updateProgressBar();
+        
+        // Если это первый кадр, показываем контент
+        if (index === 0) {
+            frameElement.style.display = 'block';
+            setTimeout(() => {
+                loadingContainer.style.opacity = '0';
+                setTimeout(() => {
+                    loadingContainer.style.display = 'none';
+                }, 500);
+            }, 500);
+        }
     };
     
     img.onerror = () => {
