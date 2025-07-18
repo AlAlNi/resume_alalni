@@ -61,3 +61,22 @@ body {
     background-color: #666;
     border-radius: 4px;
 }
+.load-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #4CAF50, #2E7D32);
+    z-index: 1001;
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+    will-change: transform;
+}
+
+#frame {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    image-rendering: crisp-edges;
+    will-change: contents;
+}
