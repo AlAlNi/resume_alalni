@@ -118,7 +118,6 @@ function updateFrame(frameIndex) {
 
 function showFrame() {
     frameElement.src = frames[currentFrame].src;
-    frameElement.style.display = 'block'; // Убедимся, что кадр видим
     updateScrollbarThumb();
     preloadAdjacentFrames();
 }
@@ -133,6 +132,6 @@ function handleWheel(e) {
 window.addEventListener('wheel', handleWheel, { passive: false });
 
 // Initialization
-frameElement.style.display = 'none'; // Сначала скрываем кадр
+frameElement.style.display = 'block'; // Показываем элемент frame сразу
 loadInitialFrame();
 initScrollbar();
