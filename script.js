@@ -13,53 +13,115 @@ const scrollbarThumb = document.getElementById('scrollbar-thumb');
 let currentFrame = 0;
 let frames = new Array(totalFrames);
 let isDragging = false;
+let isFirstInteraction = true;
 
-// 1. Добавим приоритетную загрузку первых кадров
-function loadInitialFrames() {
-    // Первые 3 кадра загружаем сразу
-    for (let i = 0; i < 3; i++) {
-        loadFrame(i, i === 0 ? showFirstFrame : null, true);
-    }
-    
-    // Остальные кадры начинаем грузить после небольшой задержки
-    setTimeout(() => {
-        for (let i = 3; i < totalFrames; i++) {
-            loadFrame(i, null, false);
-        }
-    }, 300);
-}
+// 1. Добавляем кэширование уже загруженных кадров
+const frameCache = new Map();
 
-// 2. Модифицируем функцию загрузки кадров
-function loadFrame(index, callback, isPriority) {
-    if (frames[index]) {
-        if (callback) callback();
-        return;
-    }
+// 2. Оптимизированная функция загрузки кадров
+async function loadFrame(index, priority = false) {
+    if (frames[index]) return true;
     
+    // Проверяем кэш
+    if (frameCache.has(index)) {
+        frames[index] = frameCache.get(index);
+        return true;
+    }
+
     const frameNumber = String(index).padStart(5, '0');
     const img = new Image();
     
-    // 3. Оптимизация: устанавливаем приоритет загрузки
-    if (isPriority) {
-        img.loading = 'eager';
-        img.fetchPriority = 'high';
-    } else {
-        img.loading = 'lazy';
+    // 3. Приоритетная загрузка для видимых/близких кадров
+    img.loading = priority ? 'eager' : 'lazy';
+    img.fetchPriority = priority ? 'high' : 'low';
+    
+    try {
+        const loaded = await new Promise((resolve) => {
+            img.onload = () => {
+                frames[index] = img;
+                frameCache.set(index, img); // Кэшируем
+                resolve(true);
+            };
+            img.onerror = () => {
+                console.warn(`Failed to load frame ${index}`);
+                resolve(false);
+            };
+            img.src = `${baseUrl}${frameNumber}${fileExtension}`;
+        });
+        
+        // 4. Первый кадр показываем сразу
+        if (index === 0 && loaded) {
+            showFirstFrame();
+        }
+        return loaded;
+    } catch (error) {
+        console.error('Loading error:', error);
+        return false;
     }
-    
-    img.onload = function() {
-        frames[index] = img;
-        if (callback) callback();
-    };
-    
-    img.onerror = function() {
-        console.error('Error loading frame', index);
-        if (callback) callback();
-    };
-    
-    img.src = baseUrl + frameNumber + fileExtension;
 }
 
+// 5. Улучшенная инициализация загрузки
+async function initializeLoader() {
+    // Параллельная загрузка первых кадров
+    await Promise.all([
+        loadFrame(0, true),
+        loadFrame(1, true),
+        loadFrame(2, true)
+    ]);
+    
+    // Фоновая загрузка остальных
+    setTimeout(() => {
+        for (let i = 3; i < totalFrames; i++) {
+            if (!frames[i]) {
+                loadFrame(i);
+            }
+        }
+    }, 500);
+}
+
+// 6. Оптимизированная предзагрузка
+function smartPreload() {
+    const visibleRange = 3; // Кадры вокруг текущего
+    
+    // Предзагрузка видимой области
+    for (let i = -visibleRange; i <= visibleRange; i++) {
+        const target = currentFrame + i;
+        if (target >= 0 && target < totalFrames && !frames[target]) {
+            loadFrame(target, i >= -1 && i <= 1); // Высокий приоритет для ближайших
+        }
+    }
+}
+
+// 7. Оптимизированный показ кадров
+async function showFrame(frameIndex) {
+    frameIndex = Math.max(0, Math.min(totalFrames - 1, frameIndex));
+    currentFrame = frameIndex;
+    
+    if (frames[currentFrame]) {
+        frameElement.src = frames[currentFrame].src;
+        updateScrollbar();
+        smartPreload();
+    } else {
+        // 8. Показываем плейсхолдер, если кадр не загружен
+        if (isFirstInteraction) {
+            frameElement.style.opacity = '0.5'; // Индикатор загрузки
+        }
+        
+        const loaded = await loadFrame(currentFrame, true);
+        if (loaded) {
+            frameElement.src = frames[currentFrame].src;
+            frameElement.style.opacity = '1';
+            updateScrollbar();
+            smartPreload();
+        }
+    }
+    
+    if (isFirstInteraction) {
+        isFirstInteraction = false;
+    }
+}
+
+// Остальные функции остаются без изменений
 function showFirstFrame() {
     frameElement.src = frames[0].src;
     frameElement.style.display = 'block';
@@ -72,20 +134,6 @@ function showFirstFrame() {
     initScrollbar();
 }
 
-// 4. Добавим базовую предзагрузку соседних кадров
-function preloadAdjacentFrames() {
-    const preloadDistance = 2;
-    for (let i = 1; i <= preloadDistance; i++) {
-        if (currentFrame + i < totalFrames && !frames[currentFrame + i]) {
-            loadFrame(currentFrame + i, null, true);
-        }
-        if (currentFrame - i >= 0 && !frames[currentFrame - i]) {
-            loadFrame(currentFrame - i, null, true);
-        }
-    }
-}
-
-// Остальные функции остаются без изменений
 function initScrollbar() {
     updateScrollbar();
     
@@ -127,25 +175,8 @@ function updateScrollbar() {
     scrollbarThumb.style.top = pos + 'px';
 }
 
-function showFrame(frameIndex) {
-    frameIndex = Math.max(0, Math.min(totalFrames - 1, frameIndex));
-    currentFrame = frameIndex;
-    
-    if (frames[currentFrame]) {
-        frameElement.src = frames[currentFrame].src;
-        updateScrollbar();
-        preloadAdjacentFrames(); // 5. Добавляем предзагрузку соседних кадров
-    } else {
-        loadFrame(currentFrame, function() {
-            frameElement.src = frames[currentFrame].src;
-            updateScrollbar();
-            preloadAdjacentFrames();
-        }, true);
-    }
-}
-
 // Инициализация
-loadInitialFrames(); // Заменяем вызов loadFrame(0)
+initializeLoader();
 
 window.addEventListener('wheel', function(e) {
     e.preventDefault();
