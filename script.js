@@ -1,22 +1,20 @@
-// Конфигурация
+// Configuration
 const totalFrames = 33;
 const baseUrl = 'https://raw.githubusercontent.com/AlAlNi/resume_alalni/main/sec/Comp_';
 const fileExtension = '.png';
 
-// Элементы DOM
+// DOM Elements
 const frameElement = document.getElementById('frame');
-const frameInfoElement = document.getElementById('frame-info');
 const loadingContainer = document.getElementById('loading-container');
-const progressBar = document.getElementById('progress-bar');
 const scrollbar = document.getElementById('scrollbar');
 const scrollbarThumb = document.getElementById('scrollbar-thumb');
 
-// Переменные состояния
+// State variables
 let currentFrame = 0;
 let frames = new Array(totalFrames);
 let isDragging = false;
 
-// Инициализация скроллбара
+// Scrollbar initialization
 function initScrollbar() {
     updateScrollbarThumb();
     
@@ -62,10 +60,9 @@ function updateScrollbarThumb() {
     scrollbarThumb.style.top = `${position}px`;
 }
 
-// Загрузка кадров
+// Frame loading
 function loadInitialFrame() {
     loadFrame(0, () => {
-        updateProgressBar();
         preloadAdjacentFrames();
     });
 }
@@ -83,9 +80,7 @@ function loadFrame(index, callback) {
     img.onload = () => {
         frames[index] = img;
         if (callback) callback();
-        updateProgressBar();
         
-        // Если это первый кадр, показываем контент
         if (index === 0) {
             frameElement.style.display = 'block';
             setTimeout(() => {
@@ -98,7 +93,7 @@ function loadFrame(index, callback) {
     };
     
     img.onerror = () => {
-        console.error(`Ошибка загрузки кадра ${index}`);
+        console.error(`Error loading frame ${index}`);
         if (callback) callback();
     };
 }
@@ -124,17 +119,11 @@ function updateFrame(frameIndex) {
 
 function showFrame() {
     frameElement.src = frames[currentFrame].src;
-    frameInfoElement.textContent = `Кадр ${currentFrame} из ${totalFrames - 1}`;
     updateScrollbarThumb();
     preloadAdjacentFrames();
 }
 
-function updateProgressBar() {
-    const loadedCount = frames.filter(f => f).length;
-    progressBar.style.width = `${(loadedCount / totalFrames) * 100}%`;
-}
-
-// Обработчики событий
+// Event handlers
 function handleWheel(e) {
     e.preventDefault();
     const delta = Math.sign(e.deltaY);
@@ -143,6 +132,6 @@ function handleWheel(e) {
 
 window.addEventListener('wheel', handleWheel, { passive: false });
 
-// Инициализация
+// Initialization
 loadInitialFrame();
 initScrollbar();
