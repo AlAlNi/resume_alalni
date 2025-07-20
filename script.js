@@ -6,6 +6,7 @@ class AnimationLoader {
         this.frames = [];
         this.baseUrl = 'https://storage.yandexcloud.net/presentation1/Comp_';
         this.fileExtension = '.png';
+        this.minLoadTime = 30000; // 30 секунд
 
         this.elements = {
             frame: document.getElementById('frame'),
@@ -13,18 +14,22 @@ class AnimationLoader {
             scrollbar: document.getElementById('scrollbar'),
             thumb: document.getElementById('scrollbar-thumb')
         };
-
-        this.loaderTimeout = setTimeout(() => {
-            this.hideLoader();
-        }, 30000); // 30 секунд максимум
     }
 
     async init() {
+        const startTime = Date.now();
+
         this.setupEventListeners();
         await this.loadFirstFrame();
         this.preloadOtherFrames();
-        this.elements.frame.style.display = 'block';
-        this.hideLoader(); // если кадры загрузились раньше
+
+        const elapsed = Date.now() - startTime;
+        const remaining = this.minLoadTime - elapsed;
+
+        setTimeout(() => {
+            this.elements.frame.style.display = 'block';
+            this.hideLoader();
+        }, Math.max(0, remaining));
     }
 
     getFramePath(index) {
@@ -56,7 +61,6 @@ class AnimationLoader {
                     this.frames[i] = img;
                 };
                 img.onerror = () => {
-                    console.warn(`Error loading frame ${i}`);
                     this.generateFallbackFrame(i);
                 };
                 img.src = this.getFramePath(i);
@@ -69,14 +73,8 @@ class AnimationLoader {
         canvas.width = 800;
         canvas.height = 600;
         const ctx = canvas.getContext('2d');
-
         ctx.fillStyle = `hsl(${(index * 10) % 360}, 70%, 50%)`;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        ctx.fillStyle = '#fff';
-        ctx.font = '30px Arial';
-        ctx.fillText(`Frame ${index} (Fallback)`, 50, 100);
-
         return new Promise((resolve) => {
             const img = new Image();
             img.onload = () => {
@@ -91,7 +89,6 @@ class AnimationLoader {
     }
 
     hideLoader() {
-        clearTimeout(this.loaderTimeout);
         this.elements.loading.style.display = 'none';
     }
 
@@ -121,8 +118,8 @@ class AnimationLoader {
 
     updateScrollbar() {
         const thumbHeight = this.elements.scrollbar.offsetHeight / this.totalFrames * 3;
-        const position = (this.currentFrame / (this.totalFrames - 1)) *
-            (this.elements.scrollbar.offsetHeight - thumbHeight);
+        const position = (this.currentFrame / (this.totalFrames - 1)) * 
+                         (this.elements.scrollbar.offsetHeight - thumbHeight);
         this.elements.thumb.style.height = `${thumbHeight}px`;
         this.elements.thumb.style.top = `${position}px`;
     }
@@ -136,11 +133,14 @@ class AnimationLoader {
 
         this.elements.thumb.addEventListener('mousedown', (e) => {
             this.isDragging = true;
-            document.addEventListener('mousemove', this.handleDrag.bind(this));
-            document.addEventListener('mouseup', () => {
+            const dragHandler = this.handleDrag.bind(this);
+            const stopDrag = () => {
                 this.isDragging = false;
-                document.removeEventListener('mousemove', this.handleDrag.bind(this));
-            });
+                document.removeEventListener('mousemove', dragHandler);
+                document.removeEventListener('mouseup', stopDrag);
+            };
+            document.addEventListener('mousemove', dragHandler);
+            document.addEventListener('mouseup', stopDrag);
             e.preventDefault();
         });
 
@@ -155,7 +155,6 @@ class AnimationLoader {
 
     handleDrag(e) {
         if (!this.isDragging) return;
-
         const rect = this.elements.scrollbar.getBoundingClientRect();
         const y = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
         const frame = Math.floor(y / rect.height * (this.totalFrames - 1));
