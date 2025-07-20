@@ -2,7 +2,7 @@ body {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background-color: #000;
+    background: linear-gradient(to bottom, #000, #010F24 50%, #11192C 100%);
     font-family: Arial, sans-serif;
 }
 
@@ -39,14 +39,14 @@ body {
     width: 100%;
     height: 100%;
     border: 4px solid transparent;
-    border-top-color: #00ffcc;
+    border-top-color: #3E5A92; /* основной синий */
     border-radius: 50%;
     animation: spin 1.5s linear infinite;
     opacity: 0.7;
 }
 
 .circle2 {
-    border-top-color: #ff0066;
+    border-top-color: #FF9500; /* оранжевый */
     animation-duration: 2.2s;
     width: 60px;
     height: 60px;
@@ -55,7 +55,7 @@ body {
 }
 
 .circle3 {
-    border-top-color: #ffff00;
+    border-top-color: #3E5A92;
     animation-duration: 3s;
     width: 40px;
     height: 40px;
@@ -80,14 +80,14 @@ body {
     top: 0;
     bottom: 0;
     width: 8px;
-    background-color: #333;
+    background-color: #3E5A92;
     border-radius: 4px;
 }
 
 #scrollbar-thumb {
     position: absolute;
     width: 100%;
-    background-color: #666;
+    background-color: #FF9500;
     border-radius: 4px;
     cursor: pointer;
 }
