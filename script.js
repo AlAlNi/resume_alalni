@@ -1,11 +1,12 @@
 class AnimationLoader {
     constructor() {
-        this.totalFrames = 33; // Укажите правильное количество кадров
+        this.totalFrames = 33;
         this.currentFrame = 0;
         this.isDragging = false;
         this.frames = [];
         this.baseUrl = 'https://storage.yandexcloud.net/presentation1/Comp_';
         this.fileExtension = '.png';
+        this.loaderTimeout = null;
 
         this.elements = {
             frame: document.getElementById('frame'),
@@ -17,10 +18,17 @@ class AnimationLoader {
 
     async init() {
         this.setupEventListeners();
+        this.forceHideLoaderAfterTimeout(30000); // Auto-hide after 30 seconds
         await this.loadFirstFrame();
         this.preloadOtherFrames();
         this.elements.frame.style.display = 'block';
         this.hideLoader();
+    }
+
+    forceHideLoaderAfterTimeout(ms) {
+        this.loaderTimeout = setTimeout(() => {
+            this.hideLoader();
+        }, ms);
     }
 
     getFramePath(index) {
@@ -65,13 +73,9 @@ class AnimationLoader {
         canvas.width = 800;
         canvas.height = 600;
         const ctx = canvas.getContext('2d');
-        
+
         ctx.fillStyle = `hsl(${(index * 10) % 360}, 70%, 50%)`;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        ctx.fillStyle = '#fff';
-        ctx.font = '30px Arial';
-        ctx.fillText(`Frame ${index} (Fallback)`, 50, 100);
 
         return new Promise((resolve) => {
             const img = new Image();
@@ -87,6 +91,9 @@ class AnimationLoader {
     }
 
     hideLoader() {
+        if (this.loaderTimeout) {
+            clearTimeout(this.loaderTimeout);
+        }
         this.elements.loading.style.display = 'none';
     }
 
@@ -116,8 +123,8 @@ class AnimationLoader {
 
     updateScrollbar() {
         const thumbHeight = this.elements.scrollbar.offsetHeight / this.totalFrames * 3;
-        const position = (this.currentFrame / (this.totalFrames - 1)) * 
-                        (this.elements.scrollbar.offsetHeight - thumbHeight);
+        const position = (this.currentFrame / (this.totalFrames - 1)) *
+            (this.elements.scrollbar.offsetHeight - thumbHeight);
         this.elements.thumb.style.height = `${thumbHeight}px`;
         this.elements.thumb.style.top = `${position}px`;
     }
@@ -150,7 +157,7 @@ class AnimationLoader {
 
     handleDrag(e) {
         if (!this.isDragging) return;
-        
+
         const rect = this.elements.scrollbar.getBoundingClientRect();
         const y = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
         const frame = Math.floor(y / rect.height * (this.totalFrames - 1));

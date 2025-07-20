@@ -25,9 +25,22 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white;
-    font-size: 24px;
     z-index: 100;
+}
+
+.spinner {
+    width: 80px;
+    height: 80px;
+    border: 8px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 #frame {
