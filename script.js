@@ -6,7 +6,7 @@ class AnimationLoader {
         this.frames = [];
         this.baseUrl = 'https://storage.yandexcloud.net/presentation1/Comp_';
         this.fileExtension = '.png';
-        this.minLoadTime = 30000; // 30 секунд
+        this.minLoadTime = 30000;
 
         this.elements = {
             frame: document.getElementById('frame'),
@@ -40,7 +40,10 @@ class AnimationLoader {
     async loadFirstFrame() {
         return new Promise((resolve) => {
             const img = new Image();
-            img.onload = () => {
+            img.onload = async () => {
+                try {
+                    await img.decode(); // улучшение качества рендера
+                } catch {}
                 this.frames[0] = img;
                 this.elements.frame.src = img.src;
                 resolve();
@@ -57,7 +60,10 @@ class AnimationLoader {
         for (let i = 1; i < this.totalFrames; i++) {
             setTimeout(() => {
                 const img = new Image();
-                img.onload = () => {
+                img.onload = async () => {
+                    try {
+                        await img.decode();
+                    } catch {}
                     this.frames[i] = img;
                 };
                 img.onerror = () => {
@@ -125,12 +131,24 @@ class AnimationLoader {
     }
 
     setupEventListeners() {
+        // scroll + requestAnimationFrame для Chrome оптимизации
+        let wheelDelta = 0;
+        let ticking = false;
+
         window.addEventListener('wheel', (e) => {
             e.preventDefault();
-            const newFrame = this.currentFrame + Math.sign(e.deltaY);
-            this.showFrame(newFrame);
+            wheelDelta += Math.sign(e.deltaY);
+            if (!ticking) {
+                ticking = true;
+                requestAnimationFrame(() => {
+                    this.showFrame(this.currentFrame + wheelDelta);
+                    wheelDelta = 0;
+                    ticking = false;
+                });
+            }
         }, { passive: false });
 
+        // drag scrollbar
         this.elements.thumb.addEventListener('mousedown', (e) => {
             this.isDragging = true;
             const dragHandler = this.handleDrag.bind(this);
