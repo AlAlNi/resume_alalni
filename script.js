@@ -6,7 +6,6 @@ class AnimationLoader {
         this.frames = [];
         this.baseUrl = 'https://storage.yandexcloud.net/presentation1/Comp_';
         this.fileExtension = '.png';
-        this.loaderTimeout = null;
 
         this.elements = {
             frame: document.getElementById('frame'),
@@ -14,21 +13,18 @@ class AnimationLoader {
             scrollbar: document.getElementById('scrollbar'),
             thumb: document.getElementById('scrollbar-thumb')
         };
+
+        this.loaderTimeout = setTimeout(() => {
+            this.hideLoader();
+        }, 30000); // 30 секунд максимум
     }
 
     async init() {
         this.setupEventListeners();
-        this.forceHideLoaderAfterTimeout(30000); // Auto-hide after 30 seconds
         await this.loadFirstFrame();
         this.preloadOtherFrames();
         this.elements.frame.style.display = 'block';
-        this.hideLoader();
-    }
-
-    forceHideLoaderAfterTimeout(ms) {
-        this.loaderTimeout = setTimeout(() => {
-            this.hideLoader();
-        }, ms);
+        this.hideLoader(); // если кадры загрузились раньше
     }
 
     getFramePath(index) {
@@ -77,6 +73,10 @@ class AnimationLoader {
         ctx.fillStyle = `hsl(${(index * 10) % 360}, 70%, 50%)`;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+        ctx.fillStyle = '#fff';
+        ctx.font = '30px Arial';
+        ctx.fillText(`Frame ${index} (Fallback)`, 50, 100);
+
         return new Promise((resolve) => {
             const img = new Image();
             img.onload = () => {
@@ -91,9 +91,7 @@ class AnimationLoader {
     }
 
     hideLoader() {
-        if (this.loaderTimeout) {
-            clearTimeout(this.loaderTimeout);
-        }
+        clearTimeout(this.loaderTimeout);
         this.elements.loading.style.display = 'none';
     }
 
