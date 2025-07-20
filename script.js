@@ -1,189 +1,164 @@
-/**
- * Оптимизированный загрузчик анимации с плавной прокруткой
- * Версия 4.0 - Полная оптимизация
- */
-
-// ==================== КОНФИГУРАЦИЯ ====================
-const CONFIG = {
-    totalFrames: 33,
-    baseUrl: 'https://raw.githubusercontent.com/AlAlNi/resume_alalni/main/sec/Comp_',
-    fileExtension: '.png', // Меняем на '.webp' после конвертации
-    useWebP: false,       // Включить после подготовки WebP
-    preloadDistance: 5,   // Дистанция предзагрузки
-    maxParallelLoads: 4,  // Макс. параллельных загрузок
-    loadTimeout: 300      // Интервал фоновой загрузки (мс)
-};
-
-// ==================== СИСТЕМА ЗАГРУЗКИ ====================
-class FrameLoader {
+class AnimationLoader {
     constructor() {
-        this.cache = new Map();
-        this.queue = new Set();
-        this.loaded = new Array(CONFIG.totalFrames);
-        this.priorityQueue = [];
-        this.loadedCount = 0;
-        this.connectivity = 'good'; // 'good' | 'average' | 'poor'
-    }
-
-    async load(index, priority = false) {
-        if (this.loaded[index] || this.queue.has(index)) return;
-
-        this.queue.add(index);
-        if (priority) this.priorityQueue.push(index);
-
-        try {
-            const img = new Image();
-            img.loading = priority ? 'eager' : 'lazy';
-            img.fetchPriority = priority ? 'high' : 'low';
-
-            await new Promise((resolve, reject) => {
-                img.onload = () => {
-                    this.loaded[index] = img;
-                    this.cache.set(index, img);
-                    this.loadedCount++;
-                    this.queue.delete(index);
-                    resolve(img);
-                };
-                img.onerror = reject;
-                img.src = this.getFrameUrl(index);
-            });
-        } catch (error) {
-            console.warn(`Retrying frame ${index}...`);
-            this.queue.delete(index);
-            await new Promise(r => setTimeout(r, 500));
-            return this.load(index, priority);
-        }
-    }
-
-    getFrameUrl(index) {
-        const frameNum = String(index).padStart(5, '0');
-        const ext = CONFIG.useWebP ? '.webp' : CONFIG.fileExtension;
-        return `${CONFIG.baseUrl}${frameNum}${ext}?v=2.0`;
-    }
-
-    async loadInitialBatch() {
-        const batch = [];
-        for (let i = 0; i < Math.min(4, CONFIG.totalFrames); i++) {
-            batch.push(this.load(i, i < 2));
-        }
-        await Promise.all(batch);
-        this.startBackgroundLoading();
-    }
-
-    startBackgroundLoading() {
-        let nextIndex = 4;
-        const loadNext = () => {
-            if (nextIndex >= CONFIG.totalFrames) return;
-            
-            if (this.queue.size < this.getMaxParallel()) {
-                this.load(nextIndex++);
-            }
-            setTimeout(loadNext, CONFIG.loadTimeout);
-        };
-        loadNext();
-    }
-
-    getMaxParallel() {
-        return this.connectivity === 'good' ? 4 : 
-               this.connectivity === 'average' ? 2 : 1;
-    }
-
-    preloadAround(currentIndex) {
-        const { preloadDistance } = CONFIG;
-        for (let i = 1; i <= preloadDistance; i++) {
-            const targets = [
-                currentIndex + i,
-                currentIndex - i
-            ].filter(idx => idx >= 0 && idx < CONFIG.totalFrames);
-            
-            targets.forEach(idx => {
-                if (!this.loaded[idx] && !this.queue.has(idx)) {
-                    this.load(idx, i <= 2);
-                }
-            });
-        }
-    }
-}
-
-// ==================== ОСНОВНОЙ КОД ====================
-class AnimationPlayer {
-    constructor() {
-        this.loader = new FrameLoader();
+        this.totalFrames = 33; // Укажите правильное количество кадров
         this.currentFrame = 0;
         this.isDragging = false;
-        this.scrollDirection = 'down';
-        this.lastScrollTime = 0;
-        
+        this.frames = [];
+        this.baseUrl = 'https://storage.yandexcloud.net/presentation1/Comp_';
+        this.fileExtension = '.png';
+
         this.elements = {
             frame: document.getElementById('frame'),
             loading: document.getElementById('loading-container'),
             scrollbar: document.getElementById('scrollbar'),
-            thumb: document.getElementById('scrollbar-thumb'),
-            progress: this.createProgressBar()
+            thumb: document.getElementById('scrollbar-thumb')
         };
-
-        this.init();
     }
 
-    init() {
+    async init() {
         this.setupEventListeners();
-        this.loader.loadInitialBatch().then(() => {
-            this.showFirstFrame();
-        });
-        
-        // Анализ скорости соединения
-        this.detectConnectivity();
-    }
-
-    async showFrame(index) {
-        index = Math.max(0, Math.min(CONFIG.totalFrames - 1, index));
-        this.currentFrame = index;
-
-        if (this.loader.loaded[index]) {
-            this.displayFrame(index);
-        } else {
-            this.elements.frame.style.opacity = '0.7';
-            await this.loader.load(index, true);
-            this.displayFrame(index);
-        }
-
-        this.loader.preloadAround(index);
-    }
-
-    displayFrame(index) {
-        this.elements.frame.src = this.loader.loaded[index].src;
-        this.elements.frame.style.opacity = '1';
-        this.updateScrollbar();
-        this.updateProgress();
-    }
-
-    showFirstFrame() {
-        this.elements.frame.src = this.loader.loaded[0].src;
+        await this.loadFirstFrame();
+        this.preloadOtherFrames();
         this.elements.frame.style.display = 'block';
-        
-        animateOpacity(this.elements.loading, 0, () => {
-            this.elements.loading.style.display = 'none';
+        this.hideLoader();
+    }
+
+    getFramePath(index) {
+        const frameNumber = String(index).padStart(5, '0');
+        return `${this.baseUrl}${frameNumber}${this.fileExtension}`;
+    }
+
+    async loadFirstFrame() {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+                this.frames[0] = img;
+                this.elements.frame.src = img.src;
+                resolve();
+            };
+            img.onerror = () => {
+                console.error('Error loading first frame');
+                this.generateFallbackFrame(0).then(resolve);
+            };
+            img.src = this.getFramePath(0);
         });
     }
 
-    // ... остальные методы (scrollbar, events и т.д.)
+    preloadOtherFrames() {
+        for (let i = 1; i < this.totalFrames; i++) {
+            setTimeout(() => {
+                const img = new Image();
+                img.onload = () => {
+                    this.frames[i] = img;
+                };
+                img.onerror = () => {
+                    console.warn(`Error loading frame ${i}`);
+                    this.generateFallbackFrame(i);
+                };
+                img.src = this.getFramePath(i);
+            }, i * 100);
+        }
+    }
+
+    async generateFallbackFrame(index) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 800;
+        canvas.height = 600;
+        const ctx = canvas.getContext('2d');
+        
+        ctx.fillStyle = `hsl(${(index * 10) % 360}, 70%, 50%)`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = '#fff';
+        ctx.font = '30px Arial';
+        ctx.fillText(`Frame ${index} (Fallback)`, 50, 100);
+
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+                this.frames[index] = img;
+                if (index === this.currentFrame) {
+                    this.elements.frame.src = img.src;
+                }
+                resolve();
+            };
+            img.src = canvas.toDataURL();
+        });
+    }
+
+    hideLoader() {
+        this.elements.loading.style.display = 'none';
+    }
+
+    showFrame(index) {
+        if (index >= 0 && index < this.totalFrames) {
+            this.currentFrame = index;
+            if (this.frames[index]) {
+                this.elements.frame.src = this.frames[index].src;
+            } else {
+                this.loadFrame(index);
+            }
+            this.updateScrollbar();
+        }
+    }
+
+    loadFrame(index) {
+        const img = new Image();
+        img.onload = () => {
+            this.frames[index] = img;
+            this.elements.frame.src = img.src;
+        };
+        img.onerror = () => {
+            this.generateFallbackFrame(index);
+        };
+        img.src = this.getFramePath(index);
+    }
+
+    updateScrollbar() {
+        const thumbHeight = this.elements.scrollbar.offsetHeight / this.totalFrames * 3;
+        const position = (this.currentFrame / (this.totalFrames - 1)) * 
+                        (this.elements.scrollbar.offsetHeight - thumbHeight);
+        this.elements.thumb.style.height = `${thumbHeight}px`;
+        this.elements.thumb.style.top = `${position}px`;
+    }
+
+    setupEventListeners() {
+        window.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const newFrame = this.currentFrame + Math.sign(e.deltaY);
+            this.showFrame(newFrame);
+        }, { passive: false });
+
+        this.elements.thumb.addEventListener('mousedown', (e) => {
+            this.isDragging = true;
+            document.addEventListener('mousemove', this.handleDrag.bind(this));
+            document.addEventListener('mouseup', () => {
+                this.isDragging = false;
+                document.removeEventListener('mousemove', this.handleDrag.bind(this));
+            });
+            e.preventDefault();
+        });
+
+        this.elements.scrollbar.addEventListener('click', (e) => {
+            const rect = this.elements.scrollbar.getBoundingClientRect();
+            const y = e.clientY - rect.top;
+            const percent = y / rect.height;
+            const frame = Math.floor(percent * (this.totalFrames - 1));
+            this.showFrame(frame);
+        });
+    }
+
+    handleDrag(e) {
+        if (!this.isDragging) return;
+        
+        const rect = this.elements.scrollbar.getBoundingClientRect();
+        const y = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
+        const frame = Math.floor(y / rect.height * (this.totalFrames - 1));
+        this.showFrame(frame);
+    }
 }
 
-// ==================== ПОМОЩНИКИ ====================
-function animateOpacity(element, target, callback) {
-    element.style.transition = 'opacity 0.3s ease';
-    element.style.opacity = target;
-    setTimeout(callback, 300);
-}
-
-function createProgressBar() {
-    const bar = document.createElement('div');
-    bar.className = 'load-progress';
-    document.body.appendChild(bar);
-    return bar;
-}
-
-// ==================== ЗАПУСК ====================
 document.addEventListener('DOMContentLoaded', () => {
-    new AnimationPlayer();
+    const loader = new AnimationLoader();
+    loader.init();
 });
