@@ -42,7 +42,7 @@ class AnimationLoader {
             const img = new Image();
             img.onload = async () => {
                 try {
-                    await img.decode(); // улучшение качества рендера
+                    await img.decode();
                 } catch {}
                 this.frames[0] = img;
                 this.elements.frame.src = img.src;
@@ -107,6 +107,15 @@ class AnimationLoader {
                 this.loadFrame(index);
             }
             this.updateScrollbar();
+
+            // Плавное исчезновение текста до 32 кадра
+            const intro = document.getElementById('intro-text');
+            if (intro) {
+                const fadeOutStart = 0;
+                const fadeOutEnd = 32;
+                const progress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
+                intro.style.opacity = 1 - progress;
+            }
         }
     }
 
