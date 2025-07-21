@@ -12,7 +12,8 @@ class AnimationLoader {
             frame: document.getElementById('frame'),
             loading: document.getElementById('loading-container'),
             scrollbar: document.getElementById('scrollbar'),
-            thumb: document.getElementById('scrollbar-thumb')
+            thumb: document.getElementById('scrollbar-thumb'),
+            introText: document.getElementById('intro-text')
         };
     }
 
@@ -109,7 +110,7 @@ class AnimationLoader {
             this.updateScrollbar();
 
             // Плавное исчезновение текста до 32 кадра
-            const intro = document.getElementById('intro-text');
+            const intro = this.elements.introText;
             if (intro) {
                 const fadeOutStart = 0;
                 const fadeOutEnd = 32;
@@ -133,14 +134,13 @@ class AnimationLoader {
 
     updateScrollbar() {
         const thumbHeight = this.elements.scrollbar.offsetHeight / this.totalFrames * 3;
-        const position = (this.currentFrame / (this.totalFrames - 1)) * 
+        const position = (this.currentFrame / (this.totalFrames - 1)) *
                          (this.elements.scrollbar.offsetHeight - thumbHeight);
         this.elements.thumb.style.height = `${thumbHeight}px`;
         this.elements.thumb.style.top = `${position}px`;
     }
 
     setupEventListeners() {
-        // scroll + requestAnimationFrame для Chrome оптимизации
         let wheelDelta = 0;
         let ticking = false;
 
@@ -157,7 +157,6 @@ class AnimationLoader {
             }
         }, { passive: false });
 
-        // drag scrollbar
         this.elements.thumb.addEventListener('mousedown', (e) => {
             this.isDragging = true;
             const dragHandler = this.handleDrag.bind(this);
