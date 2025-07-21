@@ -13,7 +13,9 @@ class AnimationLoader {
             loading: document.getElementById('loading-container'),
             scrollbar: document.getElementById('scrollbar'),
             thumb: document.getElementById('scrollbar-thumb'),
-            introText: document.getElementById('intro-text')
+            introText: document.getElementById('intro-text'),
+            authorContact: document.getElementById('author-contact'),
+            phaseTitle: document.getElementById('phase-title')
         };
     }
 
@@ -116,6 +118,24 @@ class AnimationLoader {
                 const fadeOutEnd = 32;
                 const progress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
                 intro.style.opacity = 1 - progress;
+            }
+
+            // Плавное исчезновение контакта до 30 кадра
+            const contact = this.elements.authorContact;
+            if (contact) {
+                const fadeOutStart = 0;
+                const fadeOutEnd = 30;
+                const progress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
+                contact.style.opacity = 1 - progress;
+            }
+
+            // Плавное появление заголовка с 30 кадра
+            const phaseTitle = this.elements.phaseTitle;
+            if (phaseTitle) {
+                const fadeInStart = 30;
+                const fadeInEnd = 33;
+                const progress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
+                phaseTitle.style.opacity = progress;
             }
         }
     }
