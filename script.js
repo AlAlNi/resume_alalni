@@ -1,6 +1,6 @@
 class AnimationLoader {
     constructor() {
-        this.totalFrames = 45; // увеличено для поддержки второй страницы
+        this.totalFrames = 132; // увеличено для поддержки третьей страницы
         this.currentFrame = 0;
         this.isDragging = false;
         this.frames = [];
@@ -13,7 +13,8 @@ class AnimationLoader {
 
         this.pages = [
             { label: '1', frame: 0 },
-            { label: '2', frame: 44 }
+            { label: '2', frame: 44 },
+            { label: '3', frame: 88 }
         ];
 
         this.elements = {
@@ -24,6 +25,7 @@ class AnimationLoader {
             introText: document.getElementById('intro-text'),
             authorContact: document.getElementById('author-contact'),
             phaseTitle: document.getElementById('phase-title'),
+            planTitle: document.getElementById('plan-title'),
             pagination: document.getElementById('pagination')
         };
     }
@@ -140,13 +142,25 @@ class AnimationLoader {
                 contact.style.opacity = 1 - progress;
             }
 
-            // Плавное появление заголовка с 30 кадра
+            // Плавное появление заголовка со 30 кадра и скрытие после второй страницы
             const phaseTitle = this.elements.phaseTitle;
             if (phaseTitle) {
                 const fadeInStart = 30;
                 const fadeInEnd = 33;
+                const fadeOutStart = 88;
+                const fadeOutEnd = 92;
+                const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
+                const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
+                phaseTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
+            }
+
+            // Плавное появление заглушки третьей страницы
+            const planTitle = this.elements.planTitle;
+            if (planTitle) {
+                const fadeInStart = 92;
+                const fadeInEnd = 95;
                 const progress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
-                phaseTitle.style.opacity = progress;
+                planTitle.style.opacity = progress;
             }
         }
     }

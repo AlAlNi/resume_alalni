@@ -157,6 +157,21 @@ body {
     text-transform: uppercase;
 }
 
+#plan-title {
+    position: absolute;
+    top: calc(160 / 2160 * 100vh);
+    left: calc(200 / 3840 * 100vw);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: calc(144 / 2160 * 100vh);
+    color: white;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    text-transform: uppercase;
+}
+
 #pagination {
     position: absolute;
     top: calc(100 / 2160 * 100vh);
