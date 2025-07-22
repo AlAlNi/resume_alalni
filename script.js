@@ -4,9 +4,9 @@ class AnimationLoader {
         this.currentFrame = 0;
         this.isDragging = false;
         this.frames = [];
-        // Use local images rather than remote storage so the demo works
-        // offline or in restricted environments.
-        this.baseUrl = 'sec/Comp_';
+        // Load frames from the remote storage bucket
+        // where the sequence is hosted.
+        this.baseUrl = 'https://storage.yandexcloud.net/presentation1/Comp_';
         this.fileExtension = '.png';
         // Reduce minimum load time to avoid long delays
         this.minLoadTime = 1000;
