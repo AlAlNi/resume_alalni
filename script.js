@@ -17,6 +17,8 @@ class AnimationLoader {
             { label: '3', frame: 88 }
         ];
 
+        this.scrollAnimation = null;
+
         this.elements = {
             frame: document.getElementById('frame'),
             loading: document.getElementById('loading-container'),
@@ -177,6 +179,20 @@ class AnimationLoader {
         img.src = this.getFramePath(index);
     }
 
+    scrollToFrame(target) {
+        if (this.scrollAnimation) {
+            cancelAnimationFrame(this.scrollAnimation);
+            this.scrollAnimation = null;
+        }
+        const step = target > this.currentFrame ? 1 : -1;
+        const animate = () => {
+            if (this.currentFrame === target) return;
+            this.showFrame(this.currentFrame + step);
+            this.scrollAnimation = requestAnimationFrame(animate);
+        };
+        animate();
+    }
+
     updateScrollbar() {
         const thumbHeight = this.elements.scrollbar.offsetHeight / this.totalFrames * 3;
         const position = (this.currentFrame / (this.totalFrames - 1)) *
@@ -193,7 +209,7 @@ class AnimationLoader {
             const btn = document.createElement('button');
             btn.className = 'page-button';
             btn.textContent = page.label;
-            btn.addEventListener('click', () => this.showFrame(page.frame));
+            btn.addEventListener('click', () => this.scrollToFrame(page.frame));
             this.elements.pagination.appendChild(btn);
             return btn;
         });
