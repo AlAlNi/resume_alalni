@@ -4,9 +4,12 @@ class AnimationLoader {
         this.currentFrame = 0;
         this.isDragging = false;
         this.frames = [];
-        this.baseUrl = 'https://storage.yandexcloud.net/presentation1/Comp_';
+        // Use local images rather than remote storage so the demo works
+        // offline or in restricted environments.
+        this.baseUrl = 'sec/Comp_';
         this.fileExtension = '.png';
-        this.minLoadTime = 30000;
+        // Reduce minimum load time to avoid long delays
+        this.minLoadTime = 1000;
 
         this.elements = {
             frame: document.getElementById('frame'),
