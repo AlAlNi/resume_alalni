@@ -1,12 +1,13 @@
 class AnimationLoader {
     constructor() {
-        this.totalFrames = 33;
+        this.totalFrames = 45;
         this.currentFrame = 0;
         this.isDragging = false;
         this.frames = [];
         this.baseUrl = 'https://storage.yandexcloud.net/presentation1/Comp_';
         this.fileExtension = '.png';
         this.minLoadTime = 30000;
+        this.pages = [0, 44];
 
         this.elements = {
             frame: document.getElementById('frame'),
@@ -15,7 +16,8 @@ class AnimationLoader {
             thumb: document.getElementById('scrollbar-thumb'),
             introText: document.getElementById('intro-text'),
             authorContact: document.getElementById('author-contact'),
-            phaseTitle: document.getElementById('phase-title')
+            phaseTitle: document.getElementById('phase-title'),
+            pagination: document.getElementById('pagination')
         };
     }
 
@@ -25,6 +27,7 @@ class AnimationLoader {
         this.setupEventListeners();
         await this.loadFirstFrame();
         this.preloadOtherFrames();
+        this.renderPagination();
 
         const elapsed = Date.now() - startTime;
         const remaining = this.minLoadTime - elapsed;
@@ -33,6 +36,35 @@ class AnimationLoader {
             this.elements.frame.style.display = 'block';
             this.hideLoader();
         }, Math.max(0, remaining));
+    }
+
+    renderPagination() {
+        if (!this.elements.pagination) return;
+        this.elements.pagination.innerHTML = '';
+        this.pages.forEach((startFrame, index) => {
+            const btn = document.createElement('button');
+            btn.textContent = (index + 1).toString();
+            btn.className = 'page-button';
+            btn.dataset.pageIndex = index;
+            btn.addEventListener('click', () => {
+                this.showFrame(startFrame);
+            });
+            this.elements.pagination.appendChild(btn);
+        });
+        this.highlightCurrentPage();
+    }
+
+    highlightCurrentPage() {
+        const buttons = this.elements.pagination.querySelectorAll('.page-button');
+        buttons.forEach((btn, index) => {
+            const pageStart = this.pages[index];
+            const pageEnd = this.pages[index + 1] || this.totalFrames - 1;
+            if (this.currentFrame >= pageStart && this.currentFrame <= pageEnd) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
     }
 
     getFramePath(index) {
@@ -110,8 +142,8 @@ class AnimationLoader {
                 this.loadFrame(index);
             }
             this.updateScrollbar();
+            this.highlightCurrentPage();
 
-            // Плавное исчезновение текста до 32 кадра
             const intro = this.elements.introText;
             if (intro) {
                 const fadeOutStart = 0;
@@ -120,7 +152,6 @@ class AnimationLoader {
                 intro.style.opacity = 1 - progress;
             }
 
-            // Плавное исчезновение контакта до 30 кадра
             const contact = this.elements.authorContact;
             if (contact) {
                 const fadeOutStart = 0;
@@ -129,7 +160,6 @@ class AnimationLoader {
                 contact.style.opacity = 1 - progress;
             }
 
-            // Плавное появление заголовка с 30 кадра
             const phaseTitle = this.elements.phaseTitle;
             if (phaseTitle) {
                 const fadeInStart = 30;
