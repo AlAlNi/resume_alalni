@@ -1,6 +1,6 @@
 class AnimationLoader {
     constructor() {
-        this.totalFrames = 33;
+        this.totalFrames = 45; // увеличено для поддержки второй страницы
         this.currentFrame = 0;
         this.isDragging = false;
         this.frames = [];
@@ -11,6 +11,11 @@ class AnimationLoader {
         // Reduce minimum load time to avoid long delays
         this.minLoadTime = 1000;
 
+        this.pages = [
+            { label: '1', frame: 0 },
+            { label: '2', frame: 44 }
+        ];
+
         this.elements = {
             frame: document.getElementById('frame'),
             loading: document.getElementById('loading-container'),
@@ -18,7 +23,8 @@ class AnimationLoader {
             thumb: document.getElementById('scrollbar-thumb'),
             introText: document.getElementById('intro-text'),
             authorContact: document.getElementById('author-contact'),
-            phaseTitle: document.getElementById('phase-title')
+            phaseTitle: document.getElementById('phase-title'),
+            pagination: document.getElementById('pagination')
         };
     }
 
@@ -26,6 +32,7 @@ class AnimationLoader {
         const startTime = Date.now();
 
         this.setupEventListeners();
+        this.buildPagination();
         await this.loadFirstFrame();
         this.preloadOtherFrames();
 
@@ -113,6 +120,7 @@ class AnimationLoader {
                 this.loadFrame(index);
             }
             this.updateScrollbar();
+            this.updatePagination();
 
             // Плавное исчезновение текста до 32 кадра
             const intro = this.elements.introText;
@@ -161,6 +169,35 @@ class AnimationLoader {
                          (this.elements.scrollbar.offsetHeight - thumbHeight);
         this.elements.thumb.style.height = `${thumbHeight}px`;
         this.elements.thumb.style.top = `${position}px`;
+    }
+
+    buildPagination() {
+        if (!this.elements.pagination) return;
+        this.elements.pagination.innerHTML = '';
+        this.pages.sort((a, b) => a.frame - b.frame);
+        this.pageButtons = this.pages.map(page => {
+            const btn = document.createElement('button');
+            btn.className = 'page-button';
+            btn.textContent = page.label;
+            btn.addEventListener('click', () => this.showFrame(page.frame));
+            this.elements.pagination.appendChild(btn);
+            return btn;
+        });
+        this.updatePagination();
+    }
+
+    updatePagination() {
+        if (!this.pageButtons) return;
+        let activeIndex = 0;
+        for (let i = 0; i < this.pages.length; i++) {
+            if (this.currentFrame >= this.pages[i].frame) {
+                activeIndex = i;
+            }
+        }
+        this.pageButtons.forEach((btn, idx) => {
+            if (idx === activeIndex) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
     }
 
     setupEventListeners() {
