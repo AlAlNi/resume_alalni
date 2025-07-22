@@ -1,214 +1,200 @@
-class AnimationLoader {
-    constructor() {
-        this.totalFrames = 33;
-        this.currentFrame = 0;
-        this.isDragging = false;
-        this.frames = [];
-        this.baseUrl = 'https://storage.yandexcloud.net/presentation1/Comp_';
-        this.fileExtension = '.png';
-        this.minLoadTime = 30000;
+@import url('https://fonts.googleapis.com/css2?family=Alumni+Sans+SC:wght@600&family=Montserrat:wght@600;800&display=swap');
 
-        this.elements = {
-            frame: document.getElementById('frame'),
-            loading: document.getElementById('loading-container'),
-            scrollbar: document.getElementById('scrollbar'),
-            thumb: document.getElementById('scrollbar-thumb'),
-            introText: document.getElementById('intro-text'),
-            authorContact: document.getElementById('author-contact'),
-            phaseTitle: document.getElementById('phase-title')
-        };
-    }
-
-    async init() {
-        const startTime = Date.now();
-
-        this.setupEventListeners();
-        await this.loadFirstFrame();
-        this.preloadOtherFrames();
-
-        const elapsed = Date.now() - startTime;
-        const remaining = this.minLoadTime - elapsed;
-
-        setTimeout(() => {
-            this.elements.frame.style.display = 'block';
-            this.hideLoader();
-        }, Math.max(0, remaining));
-    }
-
-    getFramePath(index) {
-        const frameNumber = String(index).padStart(5, '0');
-        return `${this.baseUrl}${frameNumber}${this.fileExtension}`;
-    }
-
-    async loadFirstFrame() {
-        return new Promise((resolve) => {
-            const img = new Image();
-            img.onload = async () => {
-                try {
-                    await img.decode();
-                } catch {}
-                this.frames[0] = img;
-                this.elements.frame.src = img.src;
-                resolve();
-            };
-            img.onerror = () => {
-                console.error('Error loading first frame');
-                this.generateFallbackFrame(0).then(resolve);
-            };
-            img.src = this.getFramePath(0);
-        });
-    }
-
-    preloadOtherFrames() {
-        for (let i = 1; i < this.totalFrames; i++) {
-            setTimeout(() => {
-                const img = new Image();
-                img.onload = async () => {
-                    try {
-                        await img.decode();
-                    } catch {}
-                    this.frames[i] = img;
-                };
-                img.onerror = () => {
-                    this.generateFallbackFrame(i);
-                };
-                img.src = this.getFramePath(i);
-            }, i * 100);
-        }
-    }
-
-    async generateFallbackFrame(index) {
-        const canvas = document.createElement('canvas');
-        canvas.width = 800;
-        canvas.height = 600;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = `hsl(${(index * 10) % 360}, 70%, 50%)`;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        return new Promise((resolve) => {
-            const img = new Image();
-            img.onload = () => {
-                this.frames[index] = img;
-                if (index === this.currentFrame) {
-                    this.elements.frame.src = img.src;
-                }
-                resolve();
-            };
-            img.src = canvas.toDataURL();
-        });
-    }
-
-    hideLoader() {
-        this.elements.loading.style.display = 'none';
-    }
-
-    showFrame(index) {
-        if (index >= 0 && index < this.totalFrames) {
-            this.currentFrame = index;
-            if (this.frames[index]) {
-                this.elements.frame.src = this.frames[index].src;
-            } else {
-                this.loadFrame(index);
-            }
-            this.updateScrollbar();
-
-            // Плавное исчезновение текста до 32 кадра
-            const intro = this.elements.introText;
-            if (intro) {
-                const fadeOutStart = 0;
-                const fadeOutEnd = 32;
-                const progress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
-                intro.style.opacity = 1 - progress;
-            }
-
-            // Плавное исчезновение контакта до 30 кадра
-            const contact = this.elements.authorContact;
-            if (contact) {
-                const fadeOutStart = 0;
-                const fadeOutEnd = 30;
-                const progress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
-                contact.style.opacity = 1 - progress;
-            }
-
-            // Плавное появление заголовка с 30 кадра
-            const phaseTitle = this.elements.phaseTitle;
-            if (phaseTitle) {
-                const fadeInStart = 30;
-                const fadeInEnd = 33;
-                const progress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
-                phaseTitle.style.opacity = progress;
-            }
-        }
-    }
-
-    loadFrame(index) {
-        const img = new Image();
-        img.onload = () => {
-            this.frames[index] = img;
-            this.elements.frame.src = img.src;
-        };
-        img.onerror = () => {
-            this.generateFallbackFrame(index);
-        };
-        img.src = this.getFramePath(index);
-    }
-
-    updateScrollbar() {
-        const thumbHeight = this.elements.scrollbar.offsetHeight / this.totalFrames * 3;
-        const position = (this.currentFrame / (this.totalFrames - 1)) *
-                         (this.elements.scrollbar.offsetHeight - thumbHeight);
-        this.elements.thumb.style.height = `${thumbHeight}px`;
-        this.elements.thumb.style.top = `${position}px`;
-    }
-
-    setupEventListeners() {
-        let wheelDelta = 0;
-        let ticking = false;
-
-        window.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            wheelDelta += Math.sign(e.deltaY);
-            if (!ticking) {
-                ticking = true;
-                requestAnimationFrame(() => {
-                    this.showFrame(this.currentFrame + wheelDelta);
-                    wheelDelta = 0;
-                    ticking = false;
-                });
-            }
-        }, { passive: false });
-
-        this.elements.thumb.addEventListener('mousedown', (e) => {
-            this.isDragging = true;
-            const dragHandler = this.handleDrag.bind(this);
-            const stopDrag = () => {
-                this.isDragging = false;
-                document.removeEventListener('mousemove', dragHandler);
-                document.removeEventListener('mouseup', stopDrag);
-            };
-            document.addEventListener('mousemove', dragHandler);
-            document.addEventListener('mouseup', stopDrag);
-            e.preventDefault();
-        });
-
-        this.elements.scrollbar.addEventListener('click', (e) => {
-            const rect = this.elements.scrollbar.getBoundingClientRect();
-            const y = e.clientY - rect.top;
-            const percent = y / rect.height;
-            const frame = Math.floor(percent * (this.totalFrames - 1));
-            this.showFrame(frame);
-        });
-    }
-
-    handleDrag(e) {
-        if (!this.isDragging) return;
-        const rect = this.elements.scrollbar.getBoundingClientRect();
-        const y = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
-        const frame = Math.floor(y / rect.height * (this.totalFrames - 1));
-        this.showFrame(frame);
-    }
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: linear-gradient(to bottom, #000, #010F24 50%, #11192C 100%);
+    font-family: Arial, sans-serif;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const loader = new AnimationLoader();
-    loader.init();
-});
+#animation-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#loading-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.spinner {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.circle {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 4px solid transparent;
+    border-top-color: #3E5A92;
+    border-radius: 50%;
+    animation: spin 1.5s linear infinite;
+    opacity: 0.7;
+}
+
+.circle2 {
+    border-top-color: #FF9500;
+    animation-duration: 2.2s;
+    width: 60px;
+    height: 60px;
+    top: 10px;
+    left: 10px;
+}
+
+.circle3 {
+    border-top-color: #3E5A92;
+    animation-duration: 3s;
+    width: 40px;
+    height: 40px;
+    top: 20px;
+    left: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#frame {
+    max-width: 100%;
+    max-height: 100vh;
+    display: none;
+    will-change: transform;
+    transform: translateZ(0);
+    image-rendering: auto;
+}
+
+#scrollbar {
+    position: absolute;
+    right: 5px;
+    top: 0;
+    bottom: 0;
+    width: 8px;
+    background-color: #3E5A92;
+    border-radius: 4px;
+}
+
+#scrollbar-thumb {
+    position: absolute;
+    width: 100%;
+    background-color: #FF9500;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#intro-text {
+    position: absolute;
+    bottom: calc(300 / 2160 * 100vh);
+    left: calc(200 / 3840 * 100vw);
+    z-index: 10;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    line-height: 1.1;
+}
+
+.line-1 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: calc(144 / 2160 * 100vh);
+    color: white;
+}
+
+.line-2 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: calc(280 / 2160 * 100vh);
+    color: #FF9500;
+}
+
+.line-3 {
+    font-family: 'Alumni Sans SC', sans-serif;
+    font-weight: 600;
+    font-size: calc(252 / 2160 * 100vh);
+    color: #3E5A92;
+    line-height: 1;
+}
+
+#author-contact {
+    position: absolute;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    font-size: calc(84 / 2160 * 100vh);
+    color: rgba(255, 255, 255, 0.75);
+    pointer-events: none;
+    z-index: 10;
+    transition: opacity 0.3s ease;
+    right: calc(200 / 3840 * 100vw);
+    bottom: calc((300 / 2160 * 100vh) + (252 / 2160 * 100vh) - (84 / 2160 * 100vh));
+}
+
+#phase-title {
+    position: absolute;
+    top: calc(160 / 2160 * 100vh);
+    left: calc(200 / 3840 * 100vw);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: calc(144 / 2160 * 100vh);
+    color: white;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    text-transform: uppercase;
+}
+
+#pagination {
+    position: absolute;
+    top: calc(100 / 2160 * 100vh);
+    right: calc(200 / 3840 * 100vw);
+    display: flex;
+    gap: 0.5em;
+    z-index: 10;
+    pointer-events: auto;
+}
+
+.page-button {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: calc(60 / 2160 * 100vh);
+    padding: 0.25em 0.75em;
+    background-color: rgba(62, 90, 146, 0.8);
+    color: white;
+    border: 2px solid #FF9500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.page-button:hover {
+    background-color: #FF9500;
+    color: #11192C;
+    transform: scale(1.05);
+}
+
+.page-button:active {
+    transform: scale(0.95);
+}
+
+.page-button.active {
+    background-color: #FF9500;
+    color: #11192C;
+    pointer-events: none;
+    transform: none;
+    box-shadow: 0 0 0 2px #fff;
+}
+
