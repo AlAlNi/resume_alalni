@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scroll Animation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="animation-container">
+        <div id="loading-container">
+            <div class="spinner">
+                <div class="circle circle1"></div>
+                <div class="circle circle2"></div>
+                <div class="circle circle3"></div>
+            </div>
+        </div>
+
+        <div id="intro-text">
+            <div class="line line-1">РАЗРАБОТКА</div>
+            <div class="line line-2">САЙТА</div>
+            <div class="line line-3">ДИЗАЙН-СТУДИИ</div>
+        </div>
+
+        <div id="author-contact">@al_al_ni</div>
+
+        <div id="phase-title">УЧАСТНИКИ ПРОЦЕССА</div>
+        <div id="plan-title">ПЛАН РЕАЛИЗАЦИИ</div>
+
+        <img id="frame" style="display: none;">
+        <div id="pagination"></div>
+        <div id="scrollbar">
+            <div id="scrollbar-thumb"></div>
+        </div>
+    </div>
+    <script>
+        window.animationLoaderOptions = {
+            startFrame: 44,
+            pages: [
+                { label: '2', frame: 44 },
+                { label: '3', frame: 88 }
+            ]
+        };
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
