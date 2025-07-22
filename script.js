@@ -3,6 +3,7 @@ class AnimationLoader {
         this.totalFrames = 132; // увеличено для поддержки третьей страницы
         this.currentFrame = 0;
         this.isDragging = false;
+        this.animating = false;
         this.frames = [];
         // Load frames from the remote storage bucket
         // where the sequence is hosted.
@@ -165,6 +166,21 @@ class AnimationLoader {
         }
     }
 
+    animateToFrame(target) {
+        if (this.animating) return;
+        this.animating = true;
+        const step = target > this.currentFrame ? 1 : -1;
+        const animate = () => {
+            if (this.currentFrame === target) {
+                this.animating = false;
+                return;
+            }
+            this.showFrame(this.currentFrame + step);
+            requestAnimationFrame(animate);
+        };
+        animate();
+    }
+
     loadFrame(index) {
         const img = new Image();
         img.onload = () => {
@@ -193,7 +209,7 @@ class AnimationLoader {
             const btn = document.createElement('button');
             btn.className = 'page-button';
             btn.textContent = page.label;
-            btn.addEventListener('click', () => this.showFrame(page.frame));
+            btn.addEventListener('click', () => this.animateToFrame(page.frame));
             this.elements.pagination.appendChild(btn);
             return btn;
         });
