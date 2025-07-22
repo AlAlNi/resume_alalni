@@ -27,7 +27,9 @@ class AnimationLoader {
             authorContact: document.getElementById('author-contact'),
             phaseTitle: document.getElementById('phase-title'),
             planTitle: document.getElementById('plan-title'),
-            pagination: document.getElementById('pagination')
+            pagination: document.getElementById('pagination'),
+            thirdBlock: document.getElementById('third-block'),
+            container: document.getElementById('animation-container')
         };
     }
 
@@ -162,6 +164,23 @@ class AnimationLoader {
                 const fadeInEnd = 95;
                 const progress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
                 planTitle.style.opacity = progress;
+            }
+
+            const third = this.elements.thirdBlock;
+            if (third) {
+                if (index >= 88) {
+                    third.classList.add('visible');
+                    document.body.style.overflow = 'auto';
+                    this.elements.scrollbar.style.display = 'none';
+                    this.elements.frame.style.display = 'none';
+                    if (this.elements.pagination) this.elements.pagination.style.display = 'none';
+                } else {
+                    third.classList.remove('visible');
+                    document.body.style.overflow = 'hidden';
+                    this.elements.scrollbar.style.display = 'block';
+                    this.elements.frame.style.display = 'block';
+                    if (this.elements.pagination) this.elements.pagination.style.display = '';
+                }
             }
         }
     }
