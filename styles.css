@@ -170,11 +170,36 @@ body {
 }
 
 #post-animation {
+    position: relative;
     min-height: 100vh;
-    padding: 2em;
-    background: #fff;
-    color: #000;
+    padding: calc(320 / 2160 * 100vh) 2em 2em;
+    color: #fff;
     font-family: 'Montserrat', sans-serif;
+    overflow: hidden;
+}
+
+#post-animation::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, #000, #010F24 50%, #11192C 100%);
+    transform: scaleX(-1);
+    transform-origin: center;
+    z-index: -1;
+}
+
+#post-animation h2 {
+    position: absolute;
+    top: calc(160 / 2160 * 100vh);
+    left: calc(200 / 3840 * 100vw);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: calc(144 / 2160 * 100vh);
+    color: white;
+    text-transform: uppercase;
 }
 
 .page-button {
