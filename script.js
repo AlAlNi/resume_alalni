@@ -17,7 +17,7 @@ class AnimationLoader {
         // второй завершается на 45-м кадре
         this.pages = [
             { label: '1', frame: 0 },
-            { label: '2', frame: 44 },
+            { label: '2', frame: 45 },
             { label: '3', element: document.getElementById('post-animation') }
         ];
 
@@ -151,7 +151,7 @@ class AnimationLoader {
                 const fadeInStart = 30;
                 const fadeInEnd = 33;
                 const fadeOutStart = 41;
-                const fadeOutEnd = 44;
+                const fadeOutEnd = 45;
                 const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
                 const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
                 phaseTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
