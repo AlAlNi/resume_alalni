@@ -3,7 +3,8 @@
 body {
     margin: 0;
     padding: 0;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     background: linear-gradient(to bottom, #000, #010F24 50%, #11192C 100%);
     font-family: Arial, sans-serif;
 }
@@ -157,20 +158,6 @@ body {
     text-transform: uppercase;
 }
 
-#plan-title {
-    position: absolute;
-    top: calc(160 / 2160 * 100vh);
-    left: calc(200 / 3840 * 100vw);
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
-    font-size: calc(144 / 2160 * 100vh);
-    color: white;
-    z-index: 10;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-    text-transform: uppercase;
-}
 
 #pagination {
     position: absolute;
@@ -180,6 +167,14 @@ body {
     gap: 0.5em;
     z-index: 10;
     pointer-events: auto;
+}
+
+#post-animation {
+    min-height: 100vh;
+    padding: 2em;
+    background: #fff;
+    color: #000;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .page-button {
