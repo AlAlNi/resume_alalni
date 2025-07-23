@@ -1,6 +1,6 @@
 class AnimationLoader {
     constructor() {
-        this.totalFrames = 132; // увеличено для поддержки третьей страницы
+        this.totalFrames = 88; // две страницы анимации, затем обычный контент
         this.currentFrame = 0;
         this.isDragging = false;
         this.animating = false;
@@ -14,8 +14,7 @@ class AnimationLoader {
 
         this.pages = [
             { label: '1', frame: 0 },
-            { label: '2', frame: 44 },
-            { label: '3', frame: 88 }
+            { label: '2', frame: 44 }
         ];
 
         this.elements = {
@@ -26,7 +25,6 @@ class AnimationLoader {
             introText: document.getElementById('intro-text'),
             authorContact: document.getElementById('author-contact'),
             phaseTitle: document.getElementById('phase-title'),
-            planTitle: document.getElementById('plan-title'),
             pagination: document.getElementById('pagination')
         };
     }
@@ -148,20 +146,11 @@ class AnimationLoader {
             if (phaseTitle) {
                 const fadeInStart = 30;
                 const fadeInEnd = 33;
-                const fadeOutStart = 88;
-                const fadeOutEnd = 92;
+                const fadeOutStart = 84;
+                const fadeOutEnd = 87;
                 const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
                 const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
                 phaseTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
-            }
-
-            // Плавное появление заглушки третьей страницы
-            const planTitle = this.elements.planTitle;
-            if (planTitle) {
-                const fadeInStart = 92;
-                const fadeInEnd = 95;
-                const progress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
-                planTitle.style.opacity = progress;
             }
         }
     }
@@ -235,15 +224,19 @@ class AnimationLoader {
         let ticking = false;
 
         window.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            wheelDelta += Math.sign(e.deltaY);
-            if (!ticking) {
-                ticking = true;
-                requestAnimationFrame(() => {
-                    this.showFrame(this.currentFrame + wheelDelta);
-                    wheelDelta = 0;
-                    ticking = false;
-                });
+            const direction = Math.sign(e.deltaY);
+            const nextFrame = this.currentFrame + direction;
+            if (nextFrame >= 0 && nextFrame < this.totalFrames) {
+                e.preventDefault();
+                wheelDelta += direction;
+                if (!ticking) {
+                    ticking = true;
+                    requestAnimationFrame(() => {
+                        this.showFrame(this.currentFrame + wheelDelta);
+                        wheelDelta = 0;
+                        ticking = false;
+                    });
+                }
             }
         }, { passive: false });
 
