@@ -160,7 +160,7 @@ body {
 
 
 #pagination {
-    position: absolute;
+    position: fixed;
     top: calc(100 / 2160 * 100vh);
     right: calc(200 / 3840 * 100vw);
     display: flex;
