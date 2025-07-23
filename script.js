@@ -27,7 +27,8 @@ class AnimationLoader {
             authorContact: document.getElementById('author-contact'),
             phaseTitle: document.getElementById('phase-title'),
             planTitle: document.getElementById('plan-title'),
-            pagination: document.getElementById('pagination')
+            pagination: document.getElementById('pagination'),
+            resume: document.getElementById('resume-wrapper')
         };
     }
 
@@ -162,6 +163,16 @@ class AnimationLoader {
                 const fadeInEnd = 95;
                 const progress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
                 planTitle.style.opacity = progress;
+            }
+
+            // Плавное появление секции резюме
+            const resume = this.elements.resume;
+            if (resume) {
+                const fadeInStart = 96;
+                const fadeInEnd = 100;
+                const progress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
+                resume.style.opacity = progress;
+                resume.style.pointerEvents = progress > 0 ? 'auto' : 'none';
             }
         }
     }

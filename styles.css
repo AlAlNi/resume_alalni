@@ -213,3 +213,18 @@ body {
     box-shadow: 0 0 0 2px #fff;
 }
 
+#resume-wrapper {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    overflow-y: auto;
+}
+
+#resume-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
