@@ -6,7 +6,7 @@ body {
     overflow-x: hidden;
     overflow-y: auto;
     background: linear-gradient(to bottom, #000, #010F24 50%, #11192C 100%);
-    font-family: Arial, sans-serif;
+    font-family: 'Montserrat', Arial, sans-serif;
 }
 
 #animation-container {
@@ -123,8 +123,8 @@ body {
 }
 
 .line-3 {
-    font-family: 'Alumni Sans SC', sans-serif;
-    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
     font-size: calc(252 / 2160 * 100vh);
     color: #3E5A92;
     line-height: 1;
@@ -172,9 +172,9 @@ body {
 #post-animation {
     min-height: 100vh;
     padding: 2em;
-    background: #fff;
-    color: #000;
-    font-family: 'Montserrat', sans-serif;
+    background: #11192C;
+    color: #fff;
+    font-family: 'Montserrat', Arial, sans-serif;
 }
 
 .page-button {
