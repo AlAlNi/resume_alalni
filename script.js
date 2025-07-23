@@ -1,7 +1,6 @@
 class AnimationLoader {
     constructor() {
-        // Анимация охватывает две страницы по 45 кадров
-        this.totalFrames = 45;
+        this.totalFrames = 132; // увеличено для поддержки третьей страницы
         this.currentFrame = 0;
         this.isDragging = false;
         this.animating = false;
@@ -13,15 +12,11 @@ class AnimationLoader {
         // Reduce minimum load time to avoid long delays
         this.minLoadTime = 1000;
 
-        // Первый разворот начинается с кадра 0,
-        // второй завершается на 45-м кадре
         this.pages = [
             { label: '1', frame: 0 },
-            { label: '2', frame: 45 },
-            { label: '3', element: document.getElementById('post-animation') }
+            { label: '2', frame: 44 },
+            { label: '3', frame: 88 }
         ];
-
-        this.scrollAnimation = null;
 
         this.elements = {
             frame: document.getElementById('frame'),
@@ -31,6 +26,7 @@ class AnimationLoader {
             introText: document.getElementById('intro-text'),
             authorContact: document.getElementById('author-contact'),
             phaseTitle: document.getElementById('phase-title'),
+            planTitle: document.getElementById('plan-title'),
             pagination: document.getElementById('pagination')
         };
     }
@@ -152,11 +148,20 @@ class AnimationLoader {
             if (phaseTitle) {
                 const fadeInStart = 30;
                 const fadeInEnd = 33;
-                const fadeOutStart = 41;
-                const fadeOutEnd = 45;
+                const fadeOutStart = 88;
+                const fadeOutEnd = 92;
                 const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
                 const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
                 phaseTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
+            }
+
+            // Плавное появление заглушки третьей страницы
+            const planTitle = this.elements.planTitle;
+            if (planTitle) {
+                const fadeInStart = 92;
+                const fadeInEnd = 95;
+                const progress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
+                planTitle.style.opacity = progress;
             }
         }
     }
@@ -188,20 +193,6 @@ class AnimationLoader {
         img.src = this.getFramePath(index);
     }
 
-    scrollToFrame(target) {
-        if (this.scrollAnimation) {
-            cancelAnimationFrame(this.scrollAnimation);
-            this.scrollAnimation = null;
-        }
-        const step = target > this.currentFrame ? 1 : -1;
-        const animate = () => {
-            if (this.currentFrame === target) return;
-            this.showFrame(this.currentFrame + step);
-            this.scrollAnimation = requestAnimationFrame(animate);
-        };
-        animate();
-    }
-
     updateScrollbar() {
         const thumbHeight = this.elements.scrollbar.offsetHeight / this.totalFrames * 3;
         const position = (this.currentFrame / (this.totalFrames - 1)) *
@@ -213,24 +204,12 @@ class AnimationLoader {
     buildPagination() {
         if (!this.elements.pagination) return;
         this.elements.pagination.innerHTML = '';
-        this.pages.sort((a, b) => {
-            const af = typeof a.frame === 'number' ? a.frame : Infinity;
-            const bf = typeof b.frame === 'number' ? b.frame : Infinity;
-            return af - bf;
-        });
+        this.pages.sort((a, b) => a.frame - b.frame);
         this.pageButtons = this.pages.map(page => {
             const btn = document.createElement('button');
             btn.className = 'page-button';
             btn.textContent = page.label;
-            if (page.element) {
-                btn.addEventListener('click', () => {
-                    page.element.scrollIntoView({ behavior: 'smooth' });
-                    this.pageButtons.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                });
-            } else {
-                btn.addEventListener('click', () => this.animateToFrame(page.frame));
-            }
+            btn.addEventListener('click', () => this.animateToFrame(page.frame));
             this.elements.pagination.appendChild(btn);
             return btn;
         });
@@ -241,7 +220,7 @@ class AnimationLoader {
         if (!this.pageButtons) return;
         let activeIndex = 0;
         for (let i = 0; i < this.pages.length; i++) {
-            if (typeof this.pages[i].frame === 'number' && this.currentFrame >= this.pages[i].frame) {
+            if (this.currentFrame >= this.pages[i].frame) {
                 activeIndex = i;
             }
         }
@@ -256,19 +235,15 @@ class AnimationLoader {
         let ticking = false;
 
         window.addEventListener('wheel', (e) => {
-            const direction = Math.sign(e.deltaY);
-            const nextFrame = this.currentFrame + direction;
-            if (nextFrame >= 0 && nextFrame < this.totalFrames) {
-                e.preventDefault();
-                wheelDelta += direction;
-                if (!ticking) {
-                    ticking = true;
-                    requestAnimationFrame(() => {
-                        this.showFrame(this.currentFrame + wheelDelta);
-                        wheelDelta = 0;
-                        ticking = false;
-                    });
-                }
+            e.preventDefault();
+            wheelDelta += Math.sign(e.deltaY);
+            if (!ticking) {
+                ticking = true;
+                requestAnimationFrame(() => {
+                    this.showFrame(this.currentFrame + wheelDelta);
+                    wheelDelta = 0;
+                    ticking = false;
+                });
             }
         }, { passive: false });
 
