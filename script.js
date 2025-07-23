@@ -1,7 +1,8 @@
 class AnimationLoader {
-    constructor() {
+    constructor(options = {}) {
         this.totalFrames = 132; // увеличено для поддержки третьей страницы
-        this.currentFrame = 0;
+        this.startFrame = options.startFrame || 0;
+        this.currentFrame = this.startFrame;
         this.isDragging = false;
         this.animating = false;
         this.frames = [];
@@ -12,7 +13,7 @@ class AnimationLoader {
         // Reduce minimum load time to avoid long delays
         this.minLoadTime = 1000;
 
-        this.pages = [
+        this.pages = options.pages || [
             { label: '1', frame: 0 },
             { label: '2', frame: 44 },
             { label: '3', frame: 88 }
@@ -56,19 +57,21 @@ class AnimationLoader {
     async loadFirstFrame() {
         return new Promise((resolve) => {
             const img = new Image();
+            const start = this.startFrame;
             img.onload = async () => {
                 try {
                     await img.decode();
                 } catch {}
-                this.frames[0] = img;
+                this.frames[start] = img;
+                this.currentFrame = start;
                 this.elements.frame.src = img.src;
                 resolve();
             };
             img.onerror = () => {
                 console.error('Error loading first frame');
-                this.generateFallbackFrame(0).then(resolve);
+                this.generateFallbackFrame(start).then(resolve);
             };
-            img.src = this.getFramePath(0);
+            img.src = this.getFramePath(start);
         });
     }
 
@@ -279,6 +282,7 @@ class AnimationLoader {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const loader = new AnimationLoader();
+    const options = window.animationLoaderOptions || {};
+    const loader = new AnimationLoader(options);
     loader.init();
 });
