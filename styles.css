@@ -169,6 +169,16 @@ body {
     pointer-events: auto;
 }
 
+#plan-pagination {
+    position: absolute;
+    top: calc(100 / 2160 * 100vh);
+    right: calc(200 / 3840 * 100vw);
+    display: flex;
+    gap: 0.5em;
+    z-index: 10;
+    pointer-events: auto;
+}
+
 #post-animation {
     position: relative;
     min-height: 100vh;

@@ -29,7 +29,8 @@ class AnimationLoader {
             introText: document.getElementById('intro-text'),
             authorContact: document.getElementById('author-contact'),
             phaseTitle: document.getElementById('phase-title'),
-            pagination: document.getElementById('pagination')
+            pagination: document.getElementById('pagination'),
+            planPagination: document.getElementById('plan-pagination')
         };
     }
 
@@ -195,28 +196,32 @@ class AnimationLoader {
     }
 
     buildPagination() {
-        if (!this.elements.pagination) return;
-        this.elements.pagination.innerHTML = '';
+        const containers = [this.elements.pagination, this.elements.planPagination].filter(Boolean);
+        if (containers.length === 0) return;
+        containers.forEach(c => c.innerHTML = '');
         this.pages.sort((a, b) => {
             const af = typeof a.frame === 'number' ? a.frame : Infinity;
             const bf = typeof b.frame === 'number' ? b.frame : Infinity;
             return af - bf;
         });
         this.pageButtons = this.pages.map(page => {
-            const btn = document.createElement('button');
-            btn.className = 'page-button';
-            btn.textContent = page.label;
-            if (page.element) {
-                btn.addEventListener('click', () => {
-                    page.element.scrollIntoView({ behavior: 'smooth' });
-                    this.pageButtons.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                });
-            } else {
-                btn.addEventListener('click', () => this.animateToFrame(page.frame));
-            }
-            this.elements.pagination.appendChild(btn);
-            return btn;
+            const btns = containers.map(container => {
+                const btn = document.createElement('button');
+                btn.className = 'page-button';
+                btn.textContent = page.label;
+                if (page.element) {
+                    btn.addEventListener('click', () => {
+                        page.element.scrollIntoView({ behavior: 'smooth' });
+                        this.pageButtons.forEach(list => list.forEach(b => b.classList.remove('active')));
+                        btns.forEach(b => b.classList.add('active'));
+                    });
+                } else {
+                    btn.addEventListener('click', () => this.animateToFrame(page.frame));
+                }
+                container.appendChild(btn);
+                return btn;
+            });
+            return btns;
         });
         this.updatePagination();
     }
@@ -229,9 +234,11 @@ class AnimationLoader {
                 activeIndex = i;
             }
         }
-        this.pageButtons.forEach((btn, idx) => {
-            if (idx === activeIndex) btn.classList.add('active');
-            else btn.classList.remove('active');
+        this.pageButtons.forEach((btnList, idx) => {
+            btnList.forEach(btn => {
+                if (idx === activeIndex) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
         });
     }
 
