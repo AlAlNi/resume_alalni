@@ -29,7 +29,8 @@ class AnimationLoader {
             introText: document.getElementById('intro-text'),
             authorContact: document.getElementById('author-contact'),
             phaseTitle: document.getElementById('phase-title'),
-            pagination: document.getElementById('pagination')
+            pagination: document.getElementById('pagination'),
+            animationContainer: document.getElementById('animation-container')
         };
     }
 
@@ -213,7 +214,14 @@ class AnimationLoader {
                     btn.classList.add('active');
                 });
             } else {
-                btn.addEventListener('click', () => this.animateToFrame(page.frame));
+                btn.addEventListener('click', () => {
+                    if (this.elements.animationContainer) {
+                        this.elements.animationContainer.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                    this.animateToFrame(page.frame);
+                });
             }
             this.elements.pagination.appendChild(btn);
             return btn;
