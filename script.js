@@ -14,11 +14,12 @@ class AnimationLoader {
         this.minLoadTime = 1000;
 
         // Первый разворот начинается с кадра 0,
-        // второй завершается на 45-м кадре
+        // второй завершается на 45-м кадре. Последующие
+        // элементы пагинации будут добавлены динамически
+        // из секций страницы в collectScrollSections().
         this.pages = [
             { label: '1', frame: 0 },
-            { label: '2', frame: 45 },
-            { label: '3', element: document.getElementById('post-animation') }
+            { label: '2', frame: 45 }
         ];
 
         this.elements = {
@@ -37,6 +38,7 @@ class AnimationLoader {
         const startTime = Date.now();
 
         this.setupEventListeners();
+        this.collectScrollSections();
         this.buildPagination();
         await this.loadFirstFrame();
         this.preloadOtherFrames();
@@ -114,6 +116,16 @@ class AnimationLoader {
 
     hideLoader() {
         this.elements.loading.style.display = 'none';
+    }
+
+    collectScrollSections() {
+        const sections = document.querySelectorAll('section');
+        sections.forEach((section, idx) => {
+            this.pages.push({
+                label: String(idx + 3),
+                element: section
+            });
+        });
     }
 
     showFrame(index) {
