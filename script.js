@@ -17,7 +17,8 @@ class AnimationLoader {
         // второй завершается на 45-м кадре
         this.pages = [
             { label: '1', frame: 0 },
-            { label: '2', frame: 44 }
+            { label: '2', frame: 44 },
+            { label: '3', element: document.getElementById('post-animation') }
         ];
 
         this.elements = {
@@ -196,12 +197,24 @@ class AnimationLoader {
     buildPagination() {
         if (!this.elements.pagination) return;
         this.elements.pagination.innerHTML = '';
-        this.pages.sort((a, b) => a.frame - b.frame);
+        this.pages.sort((a, b) => {
+            const af = typeof a.frame === 'number' ? a.frame : Infinity;
+            const bf = typeof b.frame === 'number' ? b.frame : Infinity;
+            return af - bf;
+        });
         this.pageButtons = this.pages.map(page => {
             const btn = document.createElement('button');
             btn.className = 'page-button';
             btn.textContent = page.label;
-            btn.addEventListener('click', () => this.animateToFrame(page.frame));
+            if (page.element) {
+                btn.addEventListener('click', () => {
+                    page.element.scrollIntoView({ behavior: 'smooth' });
+                    this.pageButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            } else {
+                btn.addEventListener('click', () => this.animateToFrame(page.frame));
+            }
             this.elements.pagination.appendChild(btn);
             return btn;
         });
@@ -212,7 +225,7 @@ class AnimationLoader {
         if (!this.pageButtons) return;
         let activeIndex = 0;
         for (let i = 0; i < this.pages.length; i++) {
-            if (this.currentFrame >= this.pages[i].frame) {
+            if (typeof this.pages[i].frame === 'number' && this.currentFrame >= this.pages[i].frame) {
                 activeIndex = i;
             }
         }
