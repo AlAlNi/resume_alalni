@@ -21,6 +21,8 @@ class AnimationLoader {
             { label: '3', element: document.getElementById('post-animation') }
         ];
 
+        this.scrollAnimation = null;
+
         this.elements = {
             frame: document.getElementById('frame'),
             loading: document.getElementById('loading-container'),
@@ -184,6 +186,20 @@ class AnimationLoader {
             this.generateFallbackFrame(index);
         };
         img.src = this.getFramePath(index);
+    }
+
+    scrollToFrame(target) {
+        if (this.scrollAnimation) {
+            cancelAnimationFrame(this.scrollAnimation);
+            this.scrollAnimation = null;
+        }
+        const step = target > this.currentFrame ? 1 : -1;
+        const animate = () => {
+            if (this.currentFrame === target) return;
+            this.showFrame(this.currentFrame + step);
+            this.scrollAnimation = requestAnimationFrame(animate);
+        };
+        animate();
     }
 
     updateScrollbar() {
