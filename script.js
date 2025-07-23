@@ -1,6 +1,7 @@
 class AnimationLoader {
     constructor() {
-        this.totalFrames = 88; // две страницы анимации, затем обычный контент
+        // Анимация охватывает две страницы по 45 кадров
+        this.totalFrames = 45;
         this.currentFrame = 0;
         this.isDragging = false;
         this.animating = false;
@@ -12,6 +13,8 @@ class AnimationLoader {
         // Reduce minimum load time to avoid long delays
         this.minLoadTime = 1000;
 
+        // Первый разворот начинается с кадра 0,
+        // второй завершается на 45-м кадре
         this.pages = [
             { label: '1', frame: 0 },
             { label: '2', frame: 44 }
@@ -146,8 +149,8 @@ class AnimationLoader {
             if (phaseTitle) {
                 const fadeInStart = 30;
                 const fadeInEnd = 33;
-                const fadeOutStart = 84;
-                const fadeOutEnd = 87;
+                const fadeOutStart = 41;
+                const fadeOutEnd = 44;
                 const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
                 const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
                 phaseTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
