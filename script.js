@@ -24,6 +24,7 @@ class AnimationLoader {
         this.scrollAnimation = null;
 
         this.elements = {
+            container: document.getElementById('animation-container'),
             frame: document.getElementById('frame'),
             loading: document.getElementById('loading-container'),
             scrollbar: document.getElementById('scrollbar'),
@@ -229,7 +230,14 @@ class AnimationLoader {
                     btn.classList.add('active');
                 });
             } else {
-                btn.addEventListener('click', () => this.animateToFrame(page.frame));
+                btn.addEventListener('click', () => {
+                    this.animateToFrame(page.frame);
+                    if (this.elements.container) {
+                        this.elements.container.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                });
             }
             this.elements.pagination.appendChild(btn);
             return btn;
