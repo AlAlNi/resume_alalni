@@ -233,3 +233,19 @@ body {
     box-shadow: 0 0 0 2px #fff;
 }
 
+.plan-page {
+    display: none;
+    max-width: 70ch;
+    margin-left: calc(200 / 3840 * 100vw);
+    font-size: calc(60 / 2160 * 100vh);
+    line-height: 1.4;
+}
+
+#plan-pagination {
+    position: absolute;
+    bottom: calc(160 / 2160 * 100vh);
+    left: calc(200 / 3840 * 100vw);
+    display: flex;
+    gap: 0.5em;
+}
+

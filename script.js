@@ -287,7 +287,47 @@ class AnimationLoader {
     }
 }
 
+class PlanPagination {
+    constructor() {
+        this.pages = Array.from(document.querySelectorAll('.plan-page'));
+        this.container = document.getElementById('plan-pagination');
+        this.buttons = [];
+        this.currentIndex = 0;
+    }
+
+    init() {
+        if (!this.container || this.pages.length === 0) return;
+        this.build();
+        this.show(0);
+    }
+
+    build() {
+        this.container.innerHTML = '';
+        this.pages.forEach((page, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'page-button';
+            btn.textContent = idx + 1;
+            btn.addEventListener('click', () => this.show(idx));
+            this.container.appendChild(btn);
+            this.buttons.push(btn);
+        });
+    }
+
+    show(index) {
+        this.pages.forEach((page, idx) => {
+            page.style.display = idx === index ? 'block' : 'none';
+        });
+        this.buttons.forEach((btn, idx) => {
+            if (idx === index) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+        this.currentIndex = index;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const loader = new AnimationLoader();
     loader.init();
+    const plan = new PlanPagination();
+    plan.init();
 });
