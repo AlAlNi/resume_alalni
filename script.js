@@ -21,6 +21,11 @@ class AnimationLoader {
             { label: '3', element: document.getElementById('post-animation') }
         ];
 
+        this.currentPageIndex = 0;
+
+        this.arrowUp = document.getElementById('arrow-up');
+        this.arrowDown = document.getElementById('arrow-down');
+
         this.elements = {
             frame: document.getElementById('frame'),
             loading: document.getElementById('loading-container'),
@@ -38,6 +43,8 @@ class AnimationLoader {
 
         this.setupEventListeners();
         this.buildPagination();
+        this.setupArrowNavigation();
+        this.setupSectionObserver();
         await this.loadFirstFrame();
         this.preloadOtherFrames();
 
@@ -211,9 +218,15 @@ class AnimationLoader {
                     page.element.scrollIntoView({ behavior: 'smooth' });
                     this.pageButtons.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
+                    this.currentPageIndex = this.pages.indexOf(page);
+                    this.updateArrowState();
                 });
             } else {
-                btn.addEventListener('click', () => this.animateToFrame(page.frame));
+                btn.addEventListener('click', () => {
+                    this.currentPageIndex = this.pages.indexOf(page);
+                    this.updateArrowState();
+                    this.animateToFrame(page.frame);
+                });
             }
             this.elements.pagination.appendChild(btn);
             return btn;
@@ -233,6 +246,60 @@ class AnimationLoader {
             if (idx === activeIndex) btn.classList.add('active');
             else btn.classList.remove('active');
         });
+        this.currentPageIndex = activeIndex;
+        this.updateArrowState();
+    }
+
+    updateArrowState() {
+        if (!this.arrowUp || !this.arrowDown) return;
+        this.arrowUp.disabled = this.currentPageIndex === 0;
+        this.arrowDown.disabled = this.currentPageIndex === this.pages.length - 1;
+    }
+
+    setupArrowNavigation() {
+        if (!this.arrowUp || !this.arrowDown) return;
+        this.updateArrowState();
+        this.arrowUp.addEventListener('click', () => {
+            if (this.currentPageIndex > 0) {
+                this.currentPageIndex--;
+                this.navigateToCurrentPage();
+            }
+        });
+        this.arrowDown.addEventListener('click', () => {
+            if (this.currentPageIndex < this.pages.length - 1) {
+                this.currentPageIndex++;
+                this.navigateToCurrentPage();
+            }
+        });
+    }
+
+    navigateToCurrentPage() {
+        const page = this.pages[this.currentPageIndex];
+        if (page.element) {
+            page.element.scrollIntoView({ behavior: 'smooth' });
+        } else if (typeof page.frame === 'number') {
+            this.animateToFrame(page.frame);
+        }
+        this.updateArrowState();
+        this.updatePagination();
+    }
+
+    setupSectionObserver() {
+        const targets = this.pages.filter(p => p.element).map(p => p.element);
+        if (!targets.length) return;
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const idx = this.pages.findIndex(p => p.element === entry.target);
+                    if (idx !== -1) {
+                        this.currentPageIndex = idx;
+                        this.updateArrowState();
+                        this.updatePagination();
+                    }
+                }
+            });
+        }, { threshold: 0.5 });
+        targets.forEach(el => observer.observe(el));
     }
 
     setupEventListeners() {
