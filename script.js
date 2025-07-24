@@ -1,6 +1,8 @@
 class AnimationLoader {
     constructor() {
-        this.totalFrames = 132; // увеличено для поддержки третьей страницы
+        // Количество кадров в секвенции
+        // обновлено на 61 в соответствии с текущими данными
+        this.totalFrames = 61;
         this.currentFrame = 0;
         this.isDragging = false;
         this.animating = false;
@@ -12,10 +14,12 @@ class AnimationLoader {
         // Reduce minimum load time to avoid long delays
         this.minLoadTime = 1000;
 
+        // Кадры начала каждой страницы
         this.pages = [
             { label: '1', frame: 0 },
             { label: '2', frame: 44 },
-            { label: '3', frame: 88 }
+            // последняя страница ведёт на заключительный кадр
+            { label: '3', frame: 60 }
         ];
 
         this.elements = {
