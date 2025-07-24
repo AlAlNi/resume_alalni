@@ -143,23 +143,22 @@ class AnimationLoader {
                 contact.style.opacity = 1 - progress;
             }
 
-            // Плавное появление заголовка со 30 кадра и скрытие после второй страницы
+            // Плавное появление и исчезновение заголовков
             const phaseTitle = this.elements.phaseTitle;
             if (phaseTitle) {
                 const fadeInStart = 30;
                 const fadeInEnd = 33;
-                const fadeOutStart = 88;
-                const fadeOutEnd = 92;
+                const fadeOutStart = 45;
+                const fadeOutEnd = 48;
                 const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
                 const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
                 phaseTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
             }
 
-            // Плавное появление заглушки третьей страницы
             const planTitle = this.elements.planTitle;
             if (planTitle) {
-                const fadeInStart = 92;
-                const fadeInEnd = 95;
+                const fadeInStart = 45;
+                const fadeInEnd = 48;
                 const progress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
                 planTitle.style.opacity = progress;
             }
