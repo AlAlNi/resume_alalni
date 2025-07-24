@@ -213,3 +213,41 @@ body {
     box-shadow: 0 0 0 2px #fff;
 }
 
+@media (max-width: 768px) {
+    #scrollbar {
+        width: 16px;
+        right: 10px;
+    }
+
+    #pagination {
+        top: 5vh;
+        right: 10px;
+    }
+
+    .page-button {
+        font-size: 2.5vh;
+    }
+
+    #intro-text {
+        bottom: 20vh;
+        left: 5vw;
+    }
+
+    .line-1 {
+        font-size: 5vh;
+    }
+
+    .line-2 {
+        font-size: 10vh;
+    }
+
+    .line-3 {
+        font-size: 9vh;
+    }
+
+    #author-contact {
+        font-size: 3vh;
+        right: 5vw;
+    }
+}
+
