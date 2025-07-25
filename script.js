@@ -7,6 +7,8 @@ class AnimationLoader {
         this.isDragging = false;
         this.animating = false;
         this.frames = [];
+        this.loadingFrames = new Set();
+        this.preloadAhead = 8;
         // Load frames from the remote storage bucket
         // where the sequence is hosted.
         this.baseUrl = 'https://storage.yandexcloud.net/presentation1/Comp_';
@@ -34,6 +36,8 @@ class AnimationLoader {
             audienceTitle: document.getElementById('audience-title'),
             pagination: document.getElementById('pagination')
         };
+
+        this.idleCallback = window.requestIdleCallback || function(cb) { setTimeout(cb, 0); };
     }
 
     async init() {
@@ -68,6 +72,7 @@ class AnimationLoader {
                 this.frames[0] = img;
                 this.elements.frame.src = img.src;
                 resolve();
+                this.preloadAround(0);
             };
             img.onerror = () => {
                 console.error('Error loading first frame');
@@ -77,22 +82,43 @@ class AnimationLoader {
         });
     }
 
-    preloadOtherFrames() {
-        for (let i = 1; i < this.totalFrames; i++) {
-            setTimeout(() => {
-                const img = new Image();
-                img.onload = async () => {
-                    try {
-                        await img.decode();
-                    } catch {}
-                    this.frames[i] = img;
-                };
-                img.onerror = () => {
-                    this.generateFallbackFrame(i);
-                };
-                img.src = this.getFramePath(i);
-            }, i * 100);
+    preloadFrame(index) {
+        if (index < 0 || index >= this.totalFrames) return;
+        if (this.frames[index] || this.loadingFrames.has(index)) return;
+        this.loadingFrames.add(index);
+        const img = new Image();
+        img.onload = async () => {
+            try {
+                await img.decode();
+            } catch {}
+            this.frames[index] = img;
+            this.loadingFrames.delete(index);
+        };
+        img.onerror = () => {
+            this.generateFallbackFrame(index).then(() => {
+                this.loadingFrames.delete(index);
+            });
+        };
+        img.src = this.getFramePath(index);
+    }
+
+    preloadAround(center) {
+        for (let i = center + 1; i <= center + this.preloadAhead; i++) {
+            this.preloadFrame(i);
         }
+    }
+
+    preloadOtherFrames() {
+        this.preloadIndex = 1;
+        const loadNext = (deadline) => {
+            while (deadline.timeRemaining() > 0 && this.preloadIndex < this.totalFrames) {
+                this.preloadFrame(this.preloadIndex++);
+            }
+            if (this.preloadIndex < this.totalFrames) {
+                this.idleCallback(loadNext);
+            }
+        };
+        this.idleCallback(loadNext);
     }
 
     async generateFallbackFrame(index) {
@@ -127,6 +153,7 @@ class AnimationLoader {
             } else {
                 this.loadFrame(index);
             }
+            this.preloadAround(index);
             this.updateScrollbar();
             this.updatePagination();
 
