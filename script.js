@@ -173,13 +173,14 @@ class AnimationLoader {
         if (this.animating) return;
         this.animating = true;
         const step = target > this.currentFrame ? 1 : -1;
+        const frameDuration = 1000 / 30; // 30 fps
         const animate = () => {
             if (this.currentFrame === target) {
                 this.animating = false;
                 return;
             }
             this.showFrame(this.currentFrame + step);
-            requestAnimationFrame(animate);
+            setTimeout(() => requestAnimationFrame(animate), frameDuration);
         };
         animate();
     }
