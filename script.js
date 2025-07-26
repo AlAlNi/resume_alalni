@@ -10,7 +10,8 @@ class AnimationLoader {
         // Load frames from the remote storage bucket
         // where the sequence is hosted.
         this.baseUrl = 'https://storage.yandexcloud.net/presentation1/Comp_';
-        this.fileExtension = '.png';
+        // Используем формат WebP для кадров секвенции
+        this.fileExtension = '.webp';
         // Reduce minimum load time to avoid long delays
         this.minLoadTime = 1000;
 
