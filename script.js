@@ -184,9 +184,17 @@ class AnimationLoader {
 
     animateToFrame(target) {
         if (this.animating) return;
+
+        // If navigating backwards or to the same frame, jump directly
+        if (target <= this.currentFrame) {
+            this.showFrame(target);
+            return;
+        }
+
         this.animating = true;
-        const step = target > this.currentFrame ? 1 : -1;
-        const frameDuration = 1000 / 30; // 30 fps
+        const step = 1; // only move forward
+        // Slow down forward animation by 1.5x (≈20fps)
+        const frameDuration = (1000 / 30) * 1.5;
         const animate = () => {
             if (this.currentFrame === target) {
                 this.animating = false;
