@@ -1,8 +1,8 @@
 class AnimationLoader {
     constructor() {
         // Количество кадров в секвенции
-        // обновлено на 226 в соответствии с текущими данными
-        this.totalFrames = 226;
+        // обновлено на 225 в соответствии с текущими данными
+        this.totalFrames = 225;
         this.currentFrame = 0;
         this.isDragging = false;
         this.animating = false;
