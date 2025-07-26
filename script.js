@@ -20,7 +20,7 @@ class AnimationLoader {
             { label: '2', frame: 60 },
             { label: '3', frame: 92 },
             // последняя страница ведёт на заключительный кадр
-            { label: '4', frame: 225 }
+            { label: '4', frame: this.totalFrames - 1 }
         ];
 
         this.elements = {
