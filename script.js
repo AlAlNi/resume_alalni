@@ -1,8 +1,8 @@
 class AnimationLoader {
     constructor() {
         // Количество кадров в секвенции
-        // обновлено на 61 в соответствии с текущими данными
-        this.totalFrames = 61;
+        // обновлено на 226 в соответствии с текущими данными
+        this.totalFrames = 226;
         this.currentFrame = 0;
         this.isDragging = false;
         this.animating = false;
@@ -10,16 +10,17 @@ class AnimationLoader {
         // Load frames from the remote storage bucket
         // where the sequence is hosted.
         this.baseUrl = 'https://storage.yandexcloud.net/presentation1/Comp_';
-        this.fileExtension = '.png';
+        this.fileExtension = '.webp';
         // Reduce minimum load time to avoid long delays
         this.minLoadTime = 1000;
 
         // Кадры начала каждой страницы
         this.pages = [
             { label: '1', frame: 0 },
-            { label: '2', frame: 44 },
+            { label: '2', frame: 60 },
+            { label: '3', frame: 92 },
             // последняя страница ведёт на заключительный кадр
-            { label: '3', frame: 60 }
+            { label: '4', frame: 225 }
         ];
 
         this.elements = {
@@ -31,6 +32,7 @@ class AnimationLoader {
             authorContact: document.getElementById('author-contact'),
             phaseTitle: document.getElementById('phase-title'),
             planTitle: document.getElementById('plan-title'),
+            audienceTitle: document.getElementById('audience-title'),
             pagination: document.getElementById('pagination')
         };
     }
@@ -163,8 +165,19 @@ class AnimationLoader {
             if (planTitle) {
                 const fadeInStart = 45;
                 const fadeInEnd = 48;
+                const fadeOutStart = 93;
+                const fadeOutEnd = 108;
+                const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
+                const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
+                planTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
+            }
+
+            const audienceTitle = this.elements.audienceTitle;
+            if (audienceTitle) {
+                const fadeInStart = 93;
+                const fadeInEnd = 108;
                 const progress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
-                planTitle.style.opacity = progress;
+                audienceTitle.style.opacity = progress;
             }
         }
     }
