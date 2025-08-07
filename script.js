@@ -272,6 +272,26 @@ class AnimationLoader {
             }
         }, { passive: false });
 
+        let touchStartY = null;
+        window.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        window.addEventListener('touchmove', (e) => {
+            if (touchStartY === null) return;
+            e.preventDefault();
+            const delta = touchStartY - e.touches[0].clientY;
+            if (Math.abs(delta) > 10) {
+                const step = delta > 0 ? 1 : -1;
+                this.showFrame(this.currentFrame + step);
+                touchStartY = e.touches[0].clientY;
+            }
+        }, { passive: false });
+
+        window.addEventListener('touchend', () => {
+            touchStartY = null;
+        });
+
         this.elements.thumb.addEventListener('mousedown', (e) => {
             this.isDragging = true;
             const dragHandler = this.handleDrag.bind(this);
@@ -285,6 +305,19 @@ class AnimationLoader {
             e.preventDefault();
         });
 
+        this.elements.thumb.addEventListener('touchstart', (e) => {
+            this.isDragging = true;
+            const dragHandler = this.handleDrag.bind(this);
+            const stopDrag = () => {
+                this.isDragging = false;
+                document.removeEventListener('touchmove', dragHandler);
+                document.removeEventListener('touchend', stopDrag);
+            };
+            document.addEventListener('touchmove', dragHandler, { passive: false });
+            document.addEventListener('touchend', stopDrag);
+            e.preventDefault();
+        }, { passive: false });
+
         this.elements.scrollbar.addEventListener('click', (e) => {
             const rect = this.elements.scrollbar.getBoundingClientRect();
             const y = e.clientY - rect.top;
@@ -297,7 +330,8 @@ class AnimationLoader {
     handleDrag(e) {
         if (!this.isDragging) return;
         const rect = this.elements.scrollbar.getBoundingClientRect();
-        const y = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const y = Math.max(0, Math.min(rect.height, clientY - rect.top));
         const frame = Math.floor(y / rect.height * (this.totalFrames - 1));
         this.showFrame(frame);
     }
