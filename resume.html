@@ -16,7 +16,8 @@
     }
 
     .resume-container {
-      width: 794px;
+      max-width: 794px;
+      width: 100%;
       background: #fff;
       margin: 0 auto;
       padding: 40px 36px;
@@ -50,8 +51,13 @@
       margin-bottom: 28px;
     }
 
-    h1, h2 {
-      margin-top: 24px;
+    h1 {
+      margin: 24px 0 16px;
+      text-align: center;
+    }
+
+    h2 {
+      margin: 32px 0 12px;
     }
 
     .section-list {
@@ -59,11 +65,15 @@
       padding-left: 20px;
     }
 
+    .section-list li {
+      margin-bottom: 6px;
+    }
+
     .skills {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 8px;
+      margin: 8px 0 16px;
     }
 
     .skill-tag {
@@ -80,7 +90,7 @@
       background: #f0f4fa;
       border-left: 4px solid #2d72d9;
       padding: 12px 18px;
-      margin-top: 18px;
+      margin-top: 24px;
       border-radius: 10px;
       font-size: 1.05em;
     }
@@ -91,7 +101,9 @@
       align-items: center;
       margin-top: 32px;
       padding: 16px 20px;
+      gap: 20px;
       border-top: 1px solid #d0d7de;
+      text-align: center;
     }
 
     .contact-info {
@@ -124,6 +136,45 @@
 
     .download-button:hover {
       background: #1b54a3;
+    }
+
+    @media (max-width: 600px) {
+      .resume-container {
+        padding: 24px 16px;
+      }
+      .profile-photo {
+        width: 110px;
+        height: 110px;
+        margin-bottom: 16px;
+      }
+      .name {
+        font-size: 1.3em;
+      }
+      .age {
+        font-size: 1em;
+        margin-bottom: 20px;
+      }
+      h1 {
+        font-size: 1.3em;
+        margin: 20px 0 14px;
+      }
+      h2 {
+        font-size: 1.1em;
+        margin-top: 26px;
+      }
+      .download-button {
+        padding: 10px 20px;
+        font-size: 0.9em;
+        margin: 16px auto;
+      }
+      .contact-block {
+        flex-direction: column;
+        align-items: center;
+      }
+      .qr-code {
+        width: 80px;
+        height: 80px;
+      }
     }
   </style>
 </head>
