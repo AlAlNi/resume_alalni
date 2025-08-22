@@ -162,6 +162,10 @@ body {
     text-transform: uppercase;
 }
 
+#prototype-title {
+    color: #000;
+}
+
 #pagination {
     position: absolute;
     top: calc(100 / 2160 * 100vh);
