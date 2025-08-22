@@ -295,7 +295,22 @@ class AnimationLoader {
                 activeIndex = i;
             }
         }
+
+        const total = this.pageButtons.length;
+        let start = Math.max(0, activeIndex - 1);
+        let end = Math.min(total - 1, activeIndex + 1);
+
+        if (end - start < 2) {
+            if (start === 0) {
+                end = Math.min(total - 1, start + 2);
+            } else if (end === total - 1) {
+                start = Math.max(0, end - 2);
+            }
+        }
+
         this.pageButtons.forEach((btn, idx) => {
+            const visible = idx >= start && idx <= end;
+            btn.style.display = visible ? '' : 'none';
             if (idx === activeIndex) btn.classList.add('active');
             else btn.classList.remove('active');
         });
