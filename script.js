@@ -1,8 +1,8 @@
 class AnimationLoader {
     constructor() {
         // Количество кадров в секвенции
-        // обновлено на 225 в соответствии с текущими данными
-        this.totalFrames = 225;
+        // обновлено на 900 в соответствии с текущими данными
+        this.totalFrames = 900;
         this.currentFrame = 0;
         this.isDragging = false;
         this.animating = false;
@@ -19,8 +19,11 @@ class AnimationLoader {
             { label: '1', frame: 0 },
             { label: '2', frame: 60 },
             { label: '3', frame: 92 },
-            // последняя страница ведёт на заключительный кадр
-            { label: '4', frame: this.totalFrames - 1 }
+            { label: '4', frame: 225 },
+            { label: '5', frame: 268 },
+            { label: '6', frame: 330 },
+            { label: '7', frame: 447 },
+            { label: '8', frame: 834 }
         ];
 
         this.elements = {
@@ -130,6 +133,13 @@ class AnimationLoader {
             }
             this.updateScrollbar();
             this.updatePagination();
+
+            const body = document.body;
+            if (index >= 683) {
+                body.style.background = '#fff';
+            } else {
+                body.style.background = '';
+            }
 
             // Плавное исчезновение текста до 32 кадра
             const intro = this.elements.introText;
