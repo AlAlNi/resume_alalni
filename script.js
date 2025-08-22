@@ -36,6 +36,9 @@ class AnimationLoader {
             phaseTitle: document.getElementById('phase-title'),
             planTitle: document.getElementById('plan-title'),
             audienceTitle: document.getElementById('audience-title'),
+            architectureTitle: document.getElementById('architecture-title'),
+            moodboardTitle: document.getElementById('moodboard-title'),
+            prototypeTitle: document.getElementById('prototype-title'),
             pagination: document.getElementById('pagination')
         };
     }
@@ -186,8 +189,41 @@ class AnimationLoader {
             if (audienceTitle) {
                 const fadeInStart = 93;
                 const fadeInEnd = 108;
+                const fadeOutStart = 225;
+                const fadeOutEnd = 268;
+                const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
+                const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
+                audienceTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
+            }
+
+            const architectureTitle = this.elements.architectureTitle;
+            if (architectureTitle) {
+                const fadeInStart = 330;
+                const fadeInEnd = 345;
+                const fadeOutStart = 447;
+                const fadeOutEnd = 462;
+                const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
+                const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
+                architectureTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
+            }
+
+            const moodboardTitle = this.elements.moodboardTitle;
+            if (moodboardTitle) {
+                const fadeInStart = 447;
+                const fadeInEnd = 462;
+                const fadeOutStart = 834;
+                const fadeOutEnd = 849;
+                const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
+                const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
+                moodboardTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
+            }
+
+            const prototypeTitle = this.elements.prototypeTitle;
+            if (prototypeTitle) {
+                const fadeInStart = 834;
+                const fadeInEnd = 849;
                 const progress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
-                audienceTitle.style.opacity = progress;
+                prototypeTitle.style.opacity = progress;
             }
         }
     }
