@@ -1,8 +1,8 @@
 class AnimationLoader {
     constructor() {
         // Количество кадров в секвенции
-        // обновлено на 225 в соответствии с текущими данными
-        this.totalFrames = 225;
+        // обновлено на 900 в соответствии с текущими данными
+        this.totalFrames = 900;
         this.currentFrame = 0;
         this.isDragging = false;
         this.animating = false;
@@ -19,8 +19,11 @@ class AnimationLoader {
             { label: '1', frame: 0 },
             { label: '2', frame: 60 },
             { label: '3', frame: 92 },
-            // последняя страница ведёт на заключительный кадр
-            { label: '4', frame: this.totalFrames - 1 }
+            { label: '4', frame: 225 },
+            { label: '5', frame: 268 },
+            { label: '6', frame: 330 },
+            { label: '7', frame: 447 },
+            { label: '8', frame: 834 }
         ];
 
         this.elements = {
@@ -33,6 +36,9 @@ class AnimationLoader {
             phaseTitle: document.getElementById('phase-title'),
             planTitle: document.getElementById('plan-title'),
             audienceTitle: document.getElementById('audience-title'),
+            architectureTitle: document.getElementById('architecture-title'),
+            moodboardTitle: document.getElementById('moodboard-title'),
+            prototypeTitle: document.getElementById('prototype-title'),
             pagination: document.getElementById('pagination')
         };
     }
@@ -131,6 +137,13 @@ class AnimationLoader {
             this.updateScrollbar();
             this.updatePagination();
 
+            // Изменение фона после 683 кадра
+            if (this.currentFrame > 683) {
+                document.body.style.background = '#fff';
+            } else {
+                document.body.style.background = '';
+            }
+
             // Плавное исчезновение текста до 32 кадра
             const intro = this.elements.introText;
             if (intro) {
@@ -178,6 +191,39 @@ class AnimationLoader {
                 const fadeInEnd = 108;
                 const progress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
                 audienceTitle.style.opacity = progress;
+            }
+
+            const architectureTitle = this.elements.architectureTitle;
+            if (architectureTitle) {
+                const fadeInStart = 330;
+                const fadeInEnd = 333;
+                const fadeOutStart = 444;
+                const fadeOutEnd = 447;
+                const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
+                const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
+                architectureTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
+            }
+
+            const moodboardTitle = this.elements.moodboardTitle;
+            if (moodboardTitle) {
+                const fadeInStart = 447;
+                const fadeInEnd = 450;
+                const fadeOutStart = 831;
+                const fadeOutEnd = 834;
+                const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
+                const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
+                moodboardTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
+            }
+
+            const prototypeTitle = this.elements.prototypeTitle;
+            if (prototypeTitle) {
+                const fadeInStart = 834;
+                const fadeInEnd = 837;
+                const fadeOutStart = 897;
+                const fadeOutEnd = 900;
+                const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
+                const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
+                prototypeTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
             }
         }
     }
