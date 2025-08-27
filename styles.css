@@ -166,17 +166,24 @@ body {
     color: #000;
 }
 
-#pagination {
+#pagination-controls {
     position: absolute;
     top: calc(100 / 2160 * 100vh);
     right: calc(200 / 3840 * 100vw);
     display: flex;
+    align-items: center;
     gap: 0.5em;
     z-index: 10;
     pointer-events: auto;
 }
 
-.page-button {
+#pagination {
+    display: flex;
+    gap: 0.5em;
+}
+
+.page-button,
+.step-button {
     font-family: 'Montserrat', sans-serif;
     font-weight: 600;
     font-size: calc(60 / 2160 * 100vh);
@@ -189,14 +196,22 @@ body {
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.page-button:hover {
+.page-button:hover,
+.step-button:hover {
     background-color: #FF9500;
     color: #11192C;
     transform: scale(1.05);
 }
 
-.page-button:active {
+.page-button:active,
+.step-button:active {
     transform: scale(0.95);
+}
+
+.step-button:disabled {
+    opacity: 0.5;
+    cursor: default;
+    transform: none;
 }
 
 .page-button.active {

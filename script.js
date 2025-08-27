@@ -26,6 +26,10 @@ class AnimationLoader {
             { label: '8', frame: 840 }
         ];
 
+        // Шаги для поэтапной навигации
+        this.steps = [0, 38, 60, 92, 225, 268, 327, 435, 840];
+        this.currentStepIndex = 0;
+
         this.elements = {
             frame: document.getElementById('frame'),
             loading: document.getElementById('loading-container'),
@@ -39,7 +43,9 @@ class AnimationLoader {
             architectureTitle: document.getElementById('architecture-title'),
             moodboardTitle: document.getElementById('moodboard-title'),
             prototypeTitle: document.getElementById('prototype-title'),
-            pagination: document.getElementById('pagination')
+            pagination: document.getElementById('pagination'),
+            stepPrev: document.getElementById('step-prev'),
+            stepNext: document.getElementById('step-next')
         };
     }
 
@@ -49,6 +55,7 @@ class AnimationLoader {
         this.setupEventListeners();
         this.buildPagination();
         await this.loadFirstFrame();
+        this.showFrame(0);
         this.preloadOtherFrames();
 
         const elapsed = Date.now() - startTime;
@@ -136,6 +143,8 @@ class AnimationLoader {
             }
             this.updateScrollbar();
             this.updatePagination();
+            this.updateStepIndex();
+            this.updateStepButtons();
 
             const body = document.body;
             if (index >= 683) {
@@ -316,6 +325,28 @@ class AnimationLoader {
         });
     }
 
+    updateStepIndex() {
+        for (let i = 0; i < this.steps.length; i++) {
+            if (this.currentFrame >= this.steps[i]) {
+                this.currentStepIndex = i;
+            }
+        }
+    }
+
+    updateStepButtons() {
+        if (!this.elements.stepPrev || !this.elements.stepNext) return;
+        this.elements.stepPrev.disabled = this.currentStepIndex === 0;
+        this.elements.stepNext.disabled = this.currentStepIndex === this.steps.length - 1;
+    }
+
+    navigateStep(direction) {
+        const newIndex = this.currentStepIndex + direction;
+        if (newIndex < 0 || newIndex >= this.steps.length) return;
+        this.currentStepIndex = newIndex;
+        this.animateToFrame(this.steps[this.currentStepIndex]);
+        this.updateStepButtons();
+    }
+
     setupEventListeners() {
         let wheelDelta = 0;
         let ticking = false;
@@ -353,6 +384,11 @@ class AnimationLoader {
             const frame = Math.floor(percent * (this.totalFrames - 1));
             this.showFrame(frame);
         });
+
+        if (this.elements.stepPrev && this.elements.stepNext) {
+            this.elements.stepPrev.addEventListener('click', () => this.navigateStep(-1));
+            this.elements.stepNext.addEventListener('click', () => this.navigateStep(1));
+        }
     }
 
     handleDrag(e) {
