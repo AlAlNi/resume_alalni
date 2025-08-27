@@ -42,7 +42,7 @@ class AnimationLoader {
             257, // Шаг 13 - comp_00257
             330, // Шаг 14 - comp_00330
             344, // Шаг 15 - comp_00344
-            355  // Шаг 16 - comp_00355
+            this.totalFrames - 1 // Шаг 16 - последний кадр
         ];
         this.currentStepIndex = 0;
 
