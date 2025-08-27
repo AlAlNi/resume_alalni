@@ -27,7 +27,24 @@ class AnimationLoader {
         ];
 
         // Шаги для поэтапной навигации
-        this.steps = [0, 38, 60, 92, 225, 268, 327, 435, 840];
+        this.steps = [
+            0,   // Шаг 1
+            38,  // Шаг 2
+            60,  // Шаг 3 - comp_00060
+            82,  // Шаг 4 - comp_00082
+            93,  // Шаг 5 - comp_00093
+            146, // Шаг 6 - comp_00146
+            185, // Шаг 7 - comp_00185
+            224, // Шаг 8 - comp_00224
+            240, // Шаг 9 - comp_00240
+            245, // Шаг 10 - comp_00245
+            249, // Шаг 11 - comp_00249
+            253, // Шаг 12 - comp_00253
+            257, // Шаг 13 - comp_00257
+            330, // Шаг 14 - comp_00330
+            344, // Шаг 15 - comp_00344
+            355  // Шаг 16 - comp_00355
+        ];
         this.currentStepIndex = 0;
 
         this.elements = {
@@ -389,6 +406,16 @@ class AnimationLoader {
             this.elements.stepPrev.addEventListener('click', () => this.navigateStep(-1));
             this.elements.stepNext.addEventListener('click', () => this.navigateStep(1));
         }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                this.navigateStep(-1);
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                this.navigateStep(1);
+            }
+        });
     }
 
     handleDrag(e) {
