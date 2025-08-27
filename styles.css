@@ -135,7 +135,8 @@ body {
     font-weight: 500;
     font-size: calc(84 / 2160 * 100vh);
     color: rgba(255, 255, 255, 0.75);
-    pointer-events: none;
+    pointer-events: auto;
+    text-decoration: none;
     z-index: 10;
     transition: opacity 0.3s ease;
     right: calc(200 / 3840 * 100vw);
