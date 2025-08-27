@@ -66,6 +66,7 @@ class AnimationLoader {
             architectureTitle: document.getElementById('architecture-title'),
             moodboardTitle: document.getElementById('moodboard-title'),
             prototypeTitle: document.getElementById('prototype-title'),
+            finalScreen: document.getElementById('final-screen'),
             pagination: document.getElementById('pagination'),
             stepPrev: document.getElementById('step-prev'),
             stepNext: document.getElementById('step-next')
@@ -254,6 +255,17 @@ class AnimationLoader {
             const fadeInEnd = 855;
             const progress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
             prototypeTitle.style.opacity = progress;
+        }
+
+        const finalScreen = this.elements.finalScreen;
+        if (finalScreen) {
+            if (index >= this.totalFrames - 1) {
+                finalScreen.style.opacity = 1;
+                finalScreen.style.pointerEvents = 'auto';
+            } else {
+                finalScreen.style.opacity = 0;
+                finalScreen.style.pointerEvents = 'none';
+            }
         }
     }
 
