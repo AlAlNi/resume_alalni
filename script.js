@@ -22,7 +22,7 @@ class AnimationLoader {
             { label: '4', frame: 225 },
             { label: '5', frame: 268 },
             { label: '6', frame: 327 },
-            { label: '7', frame: 435 },
+            { label: '7', frame: 436 },
             { label: '8', frame: 494 },
             { label: '9', frame: 509 }
         ];
@@ -44,6 +44,11 @@ class AnimationLoader {
             257, // 13 - comp_00257
             330, // 14 - comp_00330
             344, // 15 - comp_00344
+            360, // 16 - comp_00360
+            416, // 17 - comp_00416
+            426, // 18 - comp_00426
+            436, // 18 - comp_00436
+            492, // 19 - comp_00492
             509  // 99 - последний кадр (index = totalFrames-1)
         ];
         this.currentStepIndex = 0;
@@ -163,8 +168,8 @@ class AnimationLoader {
         this.updateStepButtons();
 
         const body = document.body;
-        if (index >= 683) {
-            body.style.background = '#fff';
+        if (index >= 475) {
+            body.style.background = '#9b9b9bff';
         } else {
             body.style.background = '';
         }
