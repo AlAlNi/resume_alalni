@@ -91,6 +91,8 @@ class AnimationLoader {
     async loadFirstFrame() {
         return new Promise((resolve) => {
             const img = new Image();
+            // allow loading from external buckets
+            img.crossOrigin = 'anonymous';
             img.onload = async () => {
                 try {
                     await img.decode();
@@ -109,19 +111,19 @@ class AnimationLoader {
 
     preloadOtherFrames() {
         for (let i = 1; i < this.totalFrames; i++) {
-            setTimeout(() => {
-                const img = new Image();
-                img.onload = async () => {
-                    try {
-                        await img.decode();
-                    } catch {}
-                    this.frames[i] = img;
-                };
-                img.onerror = () => {
-                    this.generateFallbackFrame(i);
-                };
-                img.src = this.getFramePath(i);
-            }, i * 100);
+            const img = new Image();
+            // allow loading from external buckets
+            img.crossOrigin = 'anonymous';
+            img.onload = async () => {
+                try {
+                    await img.decode();
+                } catch {}
+                this.frames[i] = img;
+            };
+            img.onerror = () => {
+                this.generateFallbackFrame(i);
+            };
+            img.src = this.getFramePath(i);
         }
     }
 
@@ -279,6 +281,8 @@ class AnimationLoader {
 
     loadFrame(index) {
         const img = new Image();
+        // allow loading from external buckets
+        img.crossOrigin = 'anonymous';
         img.onload = () => {
             this.frames[index] = img;
             this.elements.frame.src = img.src;
