@@ -1,20 +1,20 @@
 class AnimationLoader {
     constructor() {
-        // Количество кадров в секвенции
-        // обновлено на 510 в соответствии с текущими данными
-        this.totalFrames = 510;
+        // Фактическое число кадров: 0..500 (итого 501)
+        this.totalFrames = 501;
         this.currentFrame = 0;
         this.isDragging = false;
         this.animating = false;
         this.frames = [];
-        // Load frames from the remote storage bucket
-        // where the sequence is hosted.
+
+        // Путь к кадрам секвенции
         this.baseUrl = 'https://storage.yandexcloud.net/presentation1/Comp_';
         this.fileExtension = '.webp';
-        // Reduce minimum load time to avoid long delays
+
+        // Минимальное время лоадера
         this.minLoadTime = 1000;
 
-        // Кадры начала каждой страницы
+        // Кадры начала страниц
         this.pages = [
             { label: '1', frame: 0 },
             { label: '2', frame: 60 },
@@ -25,24 +25,24 @@ class AnimationLoader {
             { label: '7', frame: 435 }
         ];
 
-        // Шаги для поэтапной навигации
+        // Шаги по сюжету
         this.steps = [
-            0,   // Шаг 1
-            38,  // Шаг 2
-            60,  // Шаг 3 - comp_00060
-            82,  // Шаг 4 - comp_00082
-            93,  // Шаг 5 - comp_00093
-            146, // Шаг 6 - comp_00146
-            185, // Шаг 7 - comp_00185
-            224, // Шаг 8 - comp_00224
-            240, // Шаг 9 - comp_00240
-            245, // Шаг 10 - comp_00245
-            249, // Шаг 11 - comp_00249
-            253, // Шаг 12 - comp_00253
-            257, // Шаг 13 - comp_00257
-            330, // Шаг 14 - comp_00330
-            344, // Шаг 15 - comp_00344
-            this.totalFrames - 1 // Шаг 16 - последний кадр
+            0,   // 1
+            38,  // 2
+            60,  // 3 - comp_00060
+            82,  // 4 - comp_00082
+            93,  // 5 - comp_00093
+            146, // 6 - comp_00146
+            185, // 7 - comp_00185
+            224, // 8 - comp_00224
+            240, // 9 - comp_00240
+            245, // 10 - comp_00245
+            249, // 11 - comp_00249
+            253, // 12 - comp_00253
+            257, // 13 - comp_00257
+            330, // 14 - comp_00330
+            344, // 15 - comp_00344
+            500  // 16 - последний кадр (index = totalFrames-1)
         ];
         this.currentStepIndex = 0;
 
@@ -91,12 +91,9 @@ class AnimationLoader {
     async loadFirstFrame() {
         return new Promise((resolve) => {
             const img = new Image();
-            // allow loading from external buckets
-            img.crossOrigin = 'anonymous';
+            // ВАЖНО: без crossOrigin, чтобы не упираться в CORS
             img.onload = async () => {
-                try {
-                    await img.decode();
-                } catch {}
+                try { await img.decode(); } catch {}
                 this.frames[0] = img;
                 this.elements.frame.src = img.src;
                 resolve();
@@ -112,12 +109,9 @@ class AnimationLoader {
     preloadOtherFrames() {
         for (let i = 1; i < this.totalFrames; i++) {
             const img = new Image();
-            // allow loading from external buckets
-            img.crossOrigin = 'anonymous';
+            // без crossOrigin
             img.onload = async () => {
-                try {
-                    await img.decode();
-                } catch {}
+                try { await img.decode(); } catch {}
                 this.frames[i] = img;
             };
             img.onerror = () => {
@@ -152,121 +146,120 @@ class AnimationLoader {
     }
 
     showFrame(index) {
-        if (index >= 0 && index < this.totalFrames) {
-            this.currentFrame = index;
-            if (this.frames[index]) {
-                this.elements.frame.src = this.frames[index].src;
-            } else {
-                this.loadFrame(index);
-            }
-            this.updateScrollbar();
-            this.updatePagination();
-            this.updateStepIndex();
-            this.updateStepButtons();
+        if (index < 0) index = 0;
+        if (index >= this.totalFrames) index = this.totalFrames - 1;
 
-            const body = document.body;
-            if (index >= 683) {
-                body.style.background = '#fff';
-            } else {
-                body.style.background = '';
-            }
+        this.currentFrame = index;
+        if (this.frames[index]) {
+            this.elements.frame.src = this.frames[index].src;
+        } else {
+            this.loadFrame(index);
+        }
+        this.updateScrollbar();
+        this.updatePagination();
+        this.updateStepIndex();
+        this.updateStepButtons();
 
-            // Плавное исчезновение текста до 32 кадра
-            const intro = this.elements.introText;
-            if (intro) {
-                const fadeOutStart = 0;
-                const fadeOutEnd = 32;
-                const progress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
-                intro.style.opacity = 1 - progress;
-            }
+        const body = document.body;
+        if (index >= 683) {
+            body.style.background = '#fff';
+        } else {
+            body.style.background = '';
+        }
 
-            // Плавное исчезновение контакта до 30 кадра
-            const contact = this.elements.authorContact;
-            if (contact) {
-                const fadeOutStart = 0;
-                const fadeOutEnd = 30;
-                const progress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
-                contact.style.opacity = 1 - progress;
-            }
+        // Плавное исчезновение текста до 32 кадра
+        const intro = this.elements.introText;
+        if (intro) {
+            const fadeOutStart = 0;
+            const fadeOutEnd = 32;
+            const progress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
+            intro.style.opacity = 1 - progress;
+        }
 
-            // Плавное появление и исчезновение заголовков
-            const phaseTitle = this.elements.phaseTitle;
-            if (phaseTitle) {
-                const fadeInStart = 30;
-                const fadeInEnd = 33;
-                const fadeOutStart = 72;
-                const fadeOutEnd = 75;
-                const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
-                const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
-                phaseTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
-            }
+        // Плавное исчезновение контакта до 30 кадра
+        const contact = this.elements.authorContact;
+        if (contact) {
+            const fadeOutStart = 0;
+            const fadeOutEnd = 30;
+            const progress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
+            contact.style.opacity = 1 - progress;
+        }
 
-            const planTitle = this.elements.planTitle;
-            if (planTitle) {
-                const fadeInStart = 72;
-                const fadeInEnd = 75;
-                const fadeOutStart = 93;
-                const fadeOutEnd = 108;
-                const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
-                const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
-                planTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
-            }
+        // Заголовки — появление/исчезновение
+        const phaseTitle = this.elements.phaseTitle;
+        if (phaseTitle) {
+            const fadeInStart = 30;
+            const fadeInEnd = 33;
+            const fadeOutStart = 72;
+            const fadeOutEnd = 75;
+            const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
+            const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
+            phaseTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
+        }
 
-            const audienceTitle = this.elements.audienceTitle;
-            if (audienceTitle) {
-                const fadeInStart = 93;
-                const fadeInEnd = 108;
-                const fadeOutStart = 225;
-                const fadeOutEnd = 240;
-                const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
-                const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
-                audienceTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
-            }
+        const planTitle = this.elements.planTitle;
+        if (planTitle) {
+            const fadeInStart = 72;
+            const fadeInEnd = 75;
+            const fadeOutStart = 93;
+            const fadeOutEnd = 108;
+            const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
+            const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
+            planTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
+        }
 
-            const architectureTitle = this.elements.architectureTitle;
-            if (architectureTitle) {
-                const fadeInStart = 327;
-                const fadeInEnd = 342;
-                const fadeOutStart = 435;
-                const fadeOutEnd = 450;
-                const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
-                const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
-                architectureTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
-            }
+        const audienceTitle = this.elements.audienceTitle;
+        if (audienceTitle) {
+            const fadeInStart = 93;
+            const fadeInEnd = 108;
+            const fadeOutStart = 225;
+            const fadeOutEnd = 240;
+            const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
+            const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
+            audienceTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
+        }
 
-            const moodboardTitle = this.elements.moodboardTitle;
-            if (moodboardTitle) {
-                const fadeInStart = 435;
-                const fadeInEnd = 450;
-                const fadeOutStart = 840;
-                const fadeOutEnd = 855;
-                const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
-                const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
-                moodboardTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
-            }
+        const architectureTitle = this.elements.architectureTitle;
+        if (architectureTitle) {
+            const fadeInStart = 327;
+            const fadeInEnd = 342;
+            const fadeOutStart = 435;
+            const fadeOutEnd = 450;
+            const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
+            const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
+            architectureTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
+        }
 
-            const prototypeTitle = this.elements.prototypeTitle;
-            if (prototypeTitle) {
-                const fadeInStart = 840;
-                const fadeInEnd = 855;
-                const progress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
-                prototypeTitle.style.opacity = progress;
-            }
+        const moodboardTitle = this.elements.moodboardTitle;
+        if (moodboardTitle) {
+            const fadeInStart = 435;
+            const fadeInEnd = 450;
+            const fadeOutStart = 840;
+            const fadeOutEnd = 855;
+            const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
+            const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
+            moodboardTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
+        }
+
+        const prototypeTitle = this.elements.prototypeTitle;
+        if (prototypeTitle) {
+            const fadeInStart = 840;
+            const fadeInEnd = 855;
+            const progress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
+            prototypeTitle.style.opacity = progress;
         }
     }
 
     animateToFrame(target) {
         if (this.animating) return;
 
-        // If navigating backwards or to the same frame, jump directly
         if (target <= this.currentFrame) {
             this.showFrame(target);
             return;
         }
 
         this.animating = true;
-        const step = 1; // only move forward
-        // Slow down forward animation by 1.5x (≈20fps)
+        const step = 1;
         const frameDuration = (1000 / 30) * 1.5;
         const animate = () => {
             if (this.currentFrame === target) {
@@ -281,8 +274,7 @@ class AnimationLoader {
 
     loadFrame(index) {
         const img = new Image();
-        // allow loading from external buckets
-        img.crossOrigin = 'anonymous';
+        // без crossOrigin
         img.onload = () => {
             this.frames[index] = img;
             this.elements.frame.src = img.src;
@@ -434,4 +426,3 @@ document.addEventListener('DOMContentLoaded', () => {
     const loader = new AnimationLoader();
     loader.init();
 });
-
