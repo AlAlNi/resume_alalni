@@ -202,8 +202,8 @@ class AnimationLoader {
 
             const planTitle = this.elements.planTitle;
             if (planTitle) {
-                const fadeInStart = 45;
-                const fadeInEnd = 48;
+                const fadeInStart = 72;
+                const fadeInEnd = 75;
                 const fadeOutStart = 93;
                 const fadeOutEnd = 108;
                 const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
@@ -216,7 +216,7 @@ class AnimationLoader {
                 const fadeInStart = 93;
                 const fadeInEnd = 108;
                 const fadeOutStart = 225;
-                const fadeOutEnd = 268;
+                const fadeOutEnd = 240;
                 const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
                 const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
                 audienceTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
