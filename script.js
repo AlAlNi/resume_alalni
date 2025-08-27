@@ -193,8 +193,8 @@ class AnimationLoader {
             if (phaseTitle) {
                 const fadeInStart = 30;
                 const fadeInEnd = 33;
-                const fadeOutStart = 68;
-                const fadeOutEnd = 71;
+                const fadeOutStart = 72;
+                const fadeOutEnd = 75;
                 const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
                 const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
                 phaseTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
