@@ -1,15 +1,15 @@
 class AnimationLoader {
     constructor() {
         // Количество кадров в секвенции
-        // обновлено на 900 в соответствии с текущими данными
-        this.totalFrames = 900;
+        // обновлено на 510 в соответствии с текущими данными
+        this.totalFrames = 510;
         this.currentFrame = 0;
         this.isDragging = false;
         this.animating = false;
         this.frames = [];
         // Load frames from the remote storage bucket
         // where the sequence is hosted.
-        this.baseUrl = 'https://storage.yandexcloud.net/presentation1/Comp_';
+        this.baseUrl = 'https://storage.yandexcloud.net/presentation1/comp_';
         this.fileExtension = '.webp';
         // Reduce minimum load time to avoid long delays
         this.minLoadTime = 1000;
@@ -22,8 +22,7 @@ class AnimationLoader {
             { label: '4', frame: 225 },
             { label: '5', frame: 268 },
             { label: '6', frame: 327 },
-            { label: '7', frame: 435 },
-            { label: '8', frame: 840 }
+            { label: '7', frame: 435 }
         ];
 
         // Шаги для поэтапной навигации
