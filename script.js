@@ -1,7 +1,7 @@
 class AnimationLoader {
     constructor() {
-        // Фактическое число кадров: 0..500 (итого 501)
-        this.totalFrames = 501;
+        // Фактическое число кадров: 0..509 (итого 510)
+        this.totalFrames = 510;
         this.currentFrame = 0;
         this.isDragging = false;
         this.animating = false;
@@ -22,7 +22,9 @@ class AnimationLoader {
             { label: '4', frame: 225 },
             { label: '5', frame: 268 },
             { label: '6', frame: 327 },
-            { label: '7', frame: 435 }
+            { label: '7', frame: 435 },
+            { label: '8', frame: 494 },
+            { label: '9', frame: 509 }
         ];
 
         // Шаги по сюжету
@@ -42,7 +44,7 @@ class AnimationLoader {
             257, // 13 - comp_00257
             330, // 14 - comp_00330
             344, // 15 - comp_00344
-            500  // 16 - последний кадр (index = totalFrames-1)
+            509  // 99 - последний кадр (index = totalFrames-1)
         ];
         this.currentStepIndex = 0;
 
