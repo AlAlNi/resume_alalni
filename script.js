@@ -430,3 +430,4 @@ document.addEventListener('DOMContentLoaded', () => {
     const loader = new AnimationLoader();
     loader.init();
 });
+
