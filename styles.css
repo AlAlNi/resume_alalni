@@ -236,7 +236,8 @@ body {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
-    color: white;
+    background-color: #fff;
+    color: #000;
 }
 
 #final-screen .qr-links {
@@ -246,8 +247,8 @@ body {
 
 #final-screen .qr-links a {
     text-align: center;
-    color: white;
-    text-decoration: none;
+    color: #0000ee;
+    text-decoration: underline;
     font-family: 'Montserrat', sans-serif;
 }
 
