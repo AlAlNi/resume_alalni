@@ -31,6 +31,7 @@ class AnimationLoader {
         this.steps = [
             0,   // 1
             38,  // 2
+            46,  // 2_1 - comp_00046
             60,  // 3 - comp_00060
             82,  // 4 - comp_00082
             93,  // 5 - comp_00093
@@ -231,8 +232,8 @@ class AnimationLoader {
         if (architectureTitle) {
             const fadeInStart = 327;
             const fadeInEnd = 342;
-            const fadeOutStart = 435;
-            const fadeOutEnd = 449;
+            const fadeOutStart = 400;
+            const fadeOutEnd = 405;
             const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
             const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
             architectureTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
