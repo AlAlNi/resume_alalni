@@ -170,7 +170,7 @@ class AnimationLoader {
 
         const body = document.body;
         if (index >= 475) {
-            body.style.background = '#9b9b9bff';
+            body.style.background = '#8FB2C4';
         } else {
             body.style.background = '';
         }
