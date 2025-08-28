@@ -48,7 +48,7 @@ class AnimationLoader {
             416, // 17 - comp_00416
             426, // 18 - comp_00426
             436, // 18 - comp_00436
-            492, // 19 - comp_00492
+            494, // 19 - comp_00494
             509  // 99 - последний кадр (index = totalFrames-1)
         ];
         this.currentStepIndex = 0;
@@ -232,7 +232,7 @@ class AnimationLoader {
             const fadeInStart = 327;
             const fadeInEnd = 342;
             const fadeOutStart = 435;
-            const fadeOutEnd = 450;
+            const fadeOutEnd = 449;
             const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
             const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
             architectureTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
@@ -242,8 +242,8 @@ class AnimationLoader {
         if (moodboardTitle) {
             const fadeInStart = 435;
             const fadeInEnd = 450;
-            const fadeOutStart = 840;
-            const fadeOutEnd = 855;
+            const fadeOutStart = 490;
+            const fadeOutEnd = 491;
             const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
             const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
             moodboardTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
@@ -251,8 +251,10 @@ class AnimationLoader {
 
         const prototypeTitle = this.elements.prototypeTitle;
         if (prototypeTitle) {
-            const fadeInStart = 840;
-            const fadeInEnd = 855;
+            const fadeInStart = 490;
+            const fadeInEnd = 495;
+            const fadeOutStart = 498;
+            const fadeOutEnd = 500;
             const progress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
             prototypeTitle.style.opacity = progress;
         }
