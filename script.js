@@ -232,8 +232,9 @@ class AnimationLoader {
         if (architectureTitle) {
             const fadeInStart = 327;
             const fadeInEnd = 342;
-            const fadeOutStart = 400;
-            const fadeOutEnd = 405;
+            const fadeOutStart = 399
+        ;
+            const fadeOutEnd = 404;
             const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
             const fadeOutProgress = Math.min(1, Math.max(0, (index - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
             architectureTitle.style.opacity = fadeInProgress * (1 - fadeOutProgress);
@@ -241,8 +242,8 @@ class AnimationLoader {
 
         const moodboardTitle = this.elements.moodboardTitle;
         if (moodboardTitle) {
-            const fadeInStart = 400;
-            const fadeInEnd = 405;
+            const fadeInStart = 399;
+            const fadeInEnd = 404;
             const fadeOutStart = 490;
             const fadeOutEnd = 491;
             const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
