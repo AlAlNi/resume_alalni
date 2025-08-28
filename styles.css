@@ -257,3 +257,12 @@ body {
     height: 200px;
     margin-bottom: 0.5em;
 }
+
+#final-screen .final-actions {
+    position: absolute;
+    top: calc(100 / 2160 * 100vh);
+    right: calc(200 / 3840 * 100vw);
+    display: flex;
+    gap: 0.5em;
+    z-index: 11;
+}

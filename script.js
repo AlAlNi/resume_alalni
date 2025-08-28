@@ -70,7 +70,9 @@ class AnimationLoader {
             finalScreen: document.getElementById('final-screen'),
             pagination: document.getElementById('pagination'),
             stepPrev: document.getElementById('step-prev'),
-            stepNext: document.getElementById('step-next')
+            stepNext: document.getElementById('step-next'),
+            finalRestart: document.getElementById('final-restart'),
+            finalPrev: document.getElementById('final-prev')
         };
     }
 
@@ -423,6 +425,14 @@ class AnimationLoader {
         if (this.elements.stepPrev && this.elements.stepNext) {
             this.elements.stepPrev.addEventListener('click', () => this.navigateStep(-1));
             this.elements.stepNext.addEventListener('click', () => this.navigateStep(1));
+        }
+
+        // Navigation inside the final screen
+        if (this.elements.finalRestart) {
+            this.elements.finalRestart.addEventListener('click', () => this.animateToFrame(0));
+        }
+        if (this.elements.finalPrev) {
+            this.elements.finalPrev.addEventListener('click', () => this.navigateStep(-1));
         }
 
         window.addEventListener('keydown', (e) => {
