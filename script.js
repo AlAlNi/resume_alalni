@@ -240,8 +240,8 @@ class AnimationLoader {
 
         const moodboardTitle = this.elements.moodboardTitle;
         if (moodboardTitle) {
-            const fadeInStart = 435;
-            const fadeInEnd = 450;
+            const fadeInStart = 400;
+            const fadeInEnd = 405;
             const fadeOutStart = 490;
             const fadeOutEnd = 491;
             const fadeInProgress = Math.min(1, Math.max(0, (index - fadeInStart) / (fadeInEnd - fadeInStart)));
