@@ -135,9 +135,6 @@ class AnimationLoader {
             };
             img.src = this.getFramePath(i);
         }
-        // After updating UI state, maintain neighbor frames on mobile and clean cache
-        this.ensureNeighborhood(index);
-        this.evictCache(index);
     }
 
     // Mobile-safe limited preloader to avoid iOS tab reloads
@@ -300,6 +297,10 @@ class AnimationLoader {
                 finalScreen.style.pointerEvents = 'none';
             }
         }
+
+        // Maintain neighbor frames nearby and manage cache size
+        this.ensureNeighborhood(index);
+        this.evictCache(index);
     }
 
     // Preload nearby frames and evict far ones
