@@ -6,6 +6,7 @@ class AnimationLoader {
         this.isDragging = false;
         this.animating = false;
         this.frames = [];
+        this.touchState = { active: false, lastY: 0, lastX: 0, accumY: 0, accumX: 0 };
 
         // Путь к кадрам секвенции
         this.baseUrl = 'https://storage.yandexcloud.net/presentation1/Comp_';
@@ -444,6 +445,86 @@ class AnimationLoader {
                 this.navigateStep(1);
             }
         });
+
+        // --- Touch support ---
+        const container = document.getElementById('animation-container');
+        if (container) {
+            container.addEventListener('touchstart', (e) => {
+                if (!e.touches || e.touches.length === 0) return;
+                const t = e.touches[0];
+                this.touchState.active = true;
+                this.touchState.lastY = t.clientY;
+                this.touchState.lastX = t.clientX;
+                this.touchState.accumY = 0;
+                this.touchState.accumX = 0;
+            }, { passive: true });
+
+            container.addEventListener('touchmove', (e) => {
+                if (!this.touchState.active || !e.touches || e.touches.length === 0) return;
+                const t = e.touches[0];
+                const dy = this.touchState.lastY - t.clientY;
+                const dx = this.touchState.lastX - t.clientX;
+                this.touchState.lastY = t.clientY;
+                this.touchState.lastX = t.clientX;
+                // Prefer vertical swipe; fall back to horizontal
+                this.touchState.accumY += dy;
+                this.touchState.accumX += dx;
+                const threshold = 6; // pixels per frame step
+                let steps = 0;
+                if (Math.abs(this.touchState.accumY) >= threshold || Math.abs(this.touchState.accumX) >= threshold) {
+                    if (Math.abs(this.touchState.accumY) >= Math.abs(this.touchState.accumX)) {
+                        steps = Math.trunc(this.touchState.accumY / threshold);
+                        this.touchState.accumY -= steps * threshold;
+                    } else {
+                        steps = Math.trunc(this.touchState.accumX / threshold);
+                        this.touchState.accumX -= steps * threshold;
+                    }
+                }
+                if (steps !== 0) {
+                    e.preventDefault();
+                    this.showFrame(this.currentFrame + steps);
+                }
+            }, { passive: false });
+
+            container.addEventListener('touchend', () => {
+                this.touchState.active = false;
+                this.touchState.accumY = 0;
+                this.touchState.accumX = 0;
+            });
+        }
+
+        // Touch drag for scrollbar thumb
+        this.elements.thumb.addEventListener('touchstart', (e) => {
+            if (!e.touches || e.touches.length === 0) return;
+            this.isDragging = true;
+            const dragHandler = (ev) => {
+                if (!ev.touches || ev.touches.length === 0) return;
+                const rect = this.elements.scrollbar.getBoundingClientRect();
+                const y = Math.max(0, Math.min(rect.height, ev.touches[0].clientY - rect.top));
+                const frame = Math.floor(y / rect.height * (this.totalFrames - 1));
+                this.showFrame(frame);
+                ev.preventDefault();
+            };
+            const stopDrag = () => {
+                this.isDragging = false;
+                document.removeEventListener('touchmove', dragHandler);
+                document.removeEventListener('touchend', stopDrag);
+            };
+            document.addEventListener('touchmove', dragHandler, { passive: false });
+            document.addEventListener('touchend', stopDrag);
+            e.preventDefault();
+        }, { passive: false });
+
+        // Touch tap on scrollbar track
+        this.elements.scrollbar.addEventListener('touchstart', (e) => {
+            if (!e.touches || e.touches.length === 0) return;
+            const rect = this.elements.scrollbar.getBoundingClientRect();
+            const y = e.touches[0].clientY - rect.top;
+            const percent = y / rect.height;
+            const frame = Math.floor(percent * (this.totalFrames - 1));
+            this.showFrame(frame);
+            e.preventDefault();
+        }, { passive: false });
     }
 
     handleDrag(e) {

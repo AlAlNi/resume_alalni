@@ -266,3 +266,97 @@ body {
     gap: 0.5em;
     z-index: 11;
 }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    /* Use dynamic viewport height to avoid URL bar issues */
+    #animation-container {
+        height: 100dvh;
+    }
+
+    /* Make the custom scrollbar easier to touch */
+    #scrollbar {
+        right: 4px;
+        width: 12px;
+    }
+
+    #scrollbar-thumb {
+        border-radius: 6px;
+    }
+
+    /* Intro text positioning and scaling */
+    #intro-text {
+        left: 5vw;
+        bottom: 14vh;
+        line-height: 1.05;
+    }
+    .line-1 {
+        font-size: clamp(18px, 5.5vw, 36px);
+    }
+    .line-2 {
+        font-size: clamp(22px, 9vw, 56px);
+    }
+    .line-3 {
+        font-size: clamp(18px, 7.5vw, 44px);
+    }
+
+    /* Section titles */
+    #phase-title,
+    #plan-title,
+    #audience-title,
+    #architecture-title,
+    #moodboard-title,
+    #prototype-title {
+        top: 8vh;
+        left: 5vw;
+        font-size: clamp(16px, 6vw, 32px);
+    }
+
+    /* Pagination controls: move to bottom center on mobile */
+    #pagination-controls {
+        top: auto;
+        bottom: 12px;
+        right: auto;
+        left: 50%;
+        transform: translateX(-50%);
+        gap: 0.4em;
+    }
+    /* Hide numeric buttons on mobile; leave only arrows */
+    #pagination { display: none; }
+    .page-button,
+    .step-button {
+        font-size: 16px;
+        padding: 8px 12px;
+        border-width: 2px;
+        border-radius: 10px;
+        min-width: 44px; /* comfortable touch target */
+    }
+
+    /* Final screen layout tweaks */
+    #final-screen .qr-links {
+        flex-direction: column;
+        align-items: center;
+        gap: 1em;
+    }
+    #final-screen .qr-links img {
+        width: 140px;
+        height: 140px;
+    }
+    #final-screen .final-actions {
+        top: 12px;
+        right: 12px;
+    }
+}
+
+@media (max-width: 420px) {
+    /* Extra small phones */
+    .page-button,
+    .step-button {
+        font-size: 14px;
+        padding: 8px 10px;
+    }
+
+    #intro-text {
+        bottom: 12vh;
+    }
+}
