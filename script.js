@@ -7,6 +7,9 @@ class AnimationLoader {
         this.animating = false;
         this.frames = [];
         this.touchState = { active: false, lastY: 0, lastX: 0, accumY: 0, accumX: 0 };
+        // Mobile detection and cache sizing to avoid iOS tab reloads
+        this.isMobile = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(pointer: coarse)').matches : false;
+        this.maxCache = this.isMobile ? 40 : 160;
 
         // Путь к кадрам секвенции
         this.baseUrl = 'https://storage.yandexcloud.net/presentation1/Comp_';
@@ -84,7 +87,8 @@ class AnimationLoader {
         this.buildPagination();
         await this.loadFirstFrame();
         this.showFrame(0);
-        this.preloadOtherFrames();
+        if (this.isMobile) this.preloadOtherFramesMobile();
+        else this.preloadOtherFrames();
 
         const elapsed = Date.now() - startTime;
         const remaining = this.minLoadTime - elapsed;
@@ -131,6 +135,28 @@ class AnimationLoader {
             };
             img.src = this.getFramePath(i);
         }
+        // After updating UI state, maintain neighbor frames on mobile and clean cache
+        this.ensureNeighborhood(index);
+        this.evictCache(index);
+    }
+
+    // Mobile-safe limited preloader to avoid iOS tab reloads
+    preloadOtherFramesMobile() {
+        const toPreload = new Set();
+        for (let i = 1; i <= Math.min(30, this.totalFrames - 1); i++) toPreload.add(i);
+        if (Array.isArray(this.pages)) this.pages.forEach(p => { if (p.frame > 0) toPreload.add(p.frame); });
+        if (Array.isArray(this.steps)) this.steps.slice(0, 15).forEach(s => { if (s > 0) toPreload.add(s); });
+        toPreload.forEach(i => {
+            const img = new Image();
+            img.onload = async () => {
+                try { await img.decode(); } catch {}
+                this.frames[i] = img;
+            };
+            img.onerror = () => {
+                this.generateFallbackFrame(i);
+            };
+            img.src = this.getFramePath(i);
+        });
     }
 
     async generateFallbackFrame(index) {
@@ -273,6 +299,37 @@ class AnimationLoader {
                 finalScreen.style.opacity = 0;
                 finalScreen.style.pointerEvents = 'none';
             }
+        }
+    }
+
+    // Preload nearby frames and evict far ones
+    ensureNeighborhood(index) {
+        const radius = this.isMobile ? 8 : 20;
+        for (let i = Math.max(0, index - radius); i <= Math.min(this.totalFrames - 1, index + radius); i++) {
+            if (i === index) continue;
+            if (!this.frames[i]) {
+                const img = new Image();
+                img.onload = async () => {
+                    try { await img.decode(); } catch {}
+                    this.frames[i] = img;
+                };
+                img.onerror = () => {
+                    this.generateFallbackFrame(i);
+                };
+                img.src = this.getFramePath(i);
+            }
+        }
+    }
+
+    evictCache(pivot) {
+        const loaded = [];
+        for (let i = 0; i < this.frames.length; i++) if (this.frames[i]) loaded.push(i);
+        if (loaded.length <= this.maxCache) return;
+        loaded.sort((a, b) => Math.abs(b - pivot) - Math.abs(a - pivot));
+        while (loaded.length > this.maxCache) {
+            const idx = loaded.shift();
+            if (idx === pivot) continue;
+            this.frames[idx] = undefined;
         }
     }
 
